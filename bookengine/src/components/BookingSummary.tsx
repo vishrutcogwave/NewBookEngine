@@ -1,211 +1,191 @@
-import { CalendarDays, Users, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
+import type { PriceDetail, RatePlan } from "./RoomList";
 
 export interface SelectedRoom {
-  id: string;
-  roomName: string;
-  rateName: string;
-  price: number;
-  quantity: number;
+  RoomTypeId: string;
+  RoomTypeName: string;
+  RoomTypeDescription: string;
+  RoomImages: string[];
+  Amenities: string[];
+
+  Quantity: number;
+
+  AdultCount: number;
+  ChildCount: number;
+
+  RatePlan: RatePlan;
+  Price: PriceDetail;
 }
 
-interface BookingSummaryProps {
+interface Props {
   rooms: SelectedRoom[];
-  checkIn: string;
-  checkOut: string;
-  guests: string;
-  nights: number;
-  onRemove?: (id: string) => void;
+
+  onRemoveRoom: (
+    roomTypeId: string,
+    ratePlanId: string,
+    adults: number,
+    children: number
+  ) => void;
 }
 
-const BookingSummary = ({
-  rooms,
-  checkIn,
-  checkOut,
-  guests,
-  nights,
-  onRemove,
-}: BookingSummaryProps) => {
-  const roomSubtotal = rooms.reduce(
-    (sum, room) => sum + room.price * room.quantity,
-    0
-  );
+const BookingSummary = ({ rooms, onRemoveRoom }: Props) => {
+  const totalRooms = rooms.reduce((sum, room) => sum + room.Quantity, 0);
 
-  const taxes = Math.round(roomSubtotal * 0.12);
-
-  const total = roomSubtotal + taxes;
-
-  const totalRooms = rooms.reduce(
-    (sum, room) => sum + room.quantity,
+  const totalAmount = rooms.reduce(
+    (sum, room) =>
+      sum + room.Price.OfferPricePerNight * room.Quantity,
     0
   );
 
   return (
-    <div className="sticky top-5 overflow-hidden rounded-xl border bg-white shadow-lg">
+    <div className="sticky top-5 rounded-xl border bg-white shadow-sm">
 
-      {/* Header */}
-
-      <div className="flex items-center justify-between bg-[#173D8E] px-5 py-4 text-white">
-
+      <div className="border-b p-5">
         <h2 className="text-xl font-bold">
-          Your Selection
+          Booking Summary
         </h2>
 
-        <span className="rounded-full bg-[#FF6B00] px-3 py-1 text-sm font-semibold">
-          {totalRooms} Rooms
-        </span>
-
+        <p className="mt-1 text-sm text-gray-500">
+          {totalRooms} Room{totalRooms !== 1 ? "s" : ""} Selected
+        </p>
       </div>
 
-      {/* Stay */}
-
-      <div className="grid grid-cols-2 border-b bg-[#F8FAFC]">
-
-        <div className="flex gap-3 p-4">
-
-          <CalendarDays
-            size={20}
-            className="text-[#173D8E]"
-          />
-
-          <div>
-
-            <p className="text-xs font-semibold uppercase text-gray-400">
-              Stay
-            </p>
-
-            <p className="font-semibold">
-              {checkIn} → {checkOut}
-            </p>
-
-            <p className="text-sm text-gray-500">
-              {nights} Night
-            </p>
-
-          </div>
-
-        </div>
-
-        <div className="flex gap-3 p-4">
-
-          <Users
-            size={20}
-            className="text-[#173D8E]"
-          />
-
-          <div>
-
-            <p className="text-xs font-semibold uppercase text-gray-400">
-              Guests
-            </p>
-
-            <p className="font-semibold">
-              {guests}
-            </p>
-
-          </div>
-
-        </div>
-
-      </div>
-
-      {/* Rooms */}
-
-      <div>
-
-        {rooms.length === 0 ? (
-          <div className="p-6 text-center text-gray-500">
+      {rooms.length === 0 ? (
+        <div className="p-10 text-center">
+          <p className="text-gray-500">
             No rooms selected
-          </div>
-        ) : (
-          rooms.map((room) => (
-            <div
-              key={room.id}
-              className="border-b p-5"
-            >
-              <div className="flex justify-between">
+          </p>
+        </div>
+      ) : (
+        <>
+          <div className="max-h-[520px] overflow-y-auto">
 
-                <div>
+            {rooms.map((room) => (
+              <div
+                key={`${room.RoomTypeId}-${room.RatePlan.RatePlanId}-${room.AdultCount}-${room.ChildCount}`}
+                className="border-b p-4"
+              >
+                <img
+                  src={room.RoomImages[0]}
+                  className="h-32 w-full rounded-lg object-cover"
+                  alt={room.RoomTypeName}
+                />
 
-                  <h3 className="font-bold">
-                    {room.roomName}
-                  </h3>
+                <h3 className="mt-3 text-lg font-semibold">
+                  {room.RoomTypeName}
+                </h3>
 
-                  <p className="text-sm text-gray-500">
-                    {room.rateName}
-                  </p>
+                <p className="text-sm text-gray-500">
+                  {room.RatePlan.RateShortName}
+                </p>
 
-                  <p className="mt-1 text-sm text-gray-500">
-                    {room.quantity} × ₹
-                    {room.price.toLocaleString()}
-                  </p>
-
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {room.Amenities.slice(0, 3).map((item) => (
+                    <span
+                      key={item}
+                      className="rounded-full bg-gray-100 px-2 py-1 text-xs"
+                    >
+                      {item}
+                    </span>
+                  ))}
                 </div>
 
-                <div className="text-right">
+                <div className="mt-3 flex items-center justify-between">
 
-                  <div className="text-2xl font-bold">
-                    ₹
-                    {(room.price * room.quantity).toLocaleString()}
+                  <div>
+
+                    <p className="text-sm text-gray-600">
+                      Adults :
+                      <span className="font-medium">
+                        {" "}
+                        {room.AdultCount}
+                      </span>
+                    </p>
+
+                    <p className="text-sm text-gray-600">
+                      Children :
+                      <span className="font-medium">
+                        {" "}
+                        {room.ChildCount}
+                      </span>
+                    </p>
+
+                    <p className="text-sm text-gray-600">
+                      Quantity :
+                      <span className="font-medium">
+                        {" "}
+                        {room.Quantity}
+                      </span>
+                    </p>
+
+                    <p className="text-xs text-gray-400">
+                      ₹
+                      {room.Price.OfferPricePerNight.toLocaleString()}
+                      {" × "}
+                      {room.Quantity}
+                    </p>
+
                   </div>
 
-                  <button
-                    onClick={() => onRemove?.(room.id)}
-                    className="mt-2 text-red-500"
-                  >
-                    <Trash2 size={18} />
-                  </button>
+                  <div className="text-right">
+
+                    <p className="text-xl font-bold text-[#173f8a]">
+                      ₹
+                      {(
+                        room.Price.OfferPricePerNight *
+                        room.Quantity
+                      ).toLocaleString()}
+                    </p>
+
+                    <button
+                      onClick={() =>
+                        onRemoveRoom(
+                          room.RoomTypeId,
+                          room.RatePlan.RatePlanId,
+                          room.AdultCount,
+                          room.ChildCount
+                        )
+                      }
+                      className="mt-3 flex items-center gap-1 text-sm text-red-600 hover:text-red-700"
+                    >
+                      <Trash2 size={16} />
+                      Remove
+                    </button>
+
+                  </div>
 
                 </div>
 
               </div>
+            ))}
+
+          </div>
+
+          <div className="space-y-3 border-t p-5">
+
+            <div className="flex justify-between">
+              <span>Total Rooms</span>
+
+              <span className="font-semibold">
+                {totalRooms}
+              </span>
             </div>
-          ))
-        )}
 
-      </div>
+            <div className="flex justify-between">
+              <span>Total Amount</span>
 
-      {/* Totals */}
+              <span className="text-2xl font-bold text-[#173f8a]">
+                ₹{totalAmount.toLocaleString()}
+              </span>
+            </div>
 
-      <div className="space-y-3 border-t bg-[#F8FAFC] p-5">
+            <button className="w-full rounded-lg bg-[#173f8a] py-3 font-semibold text-white hover:bg-[#102f6c]">
+              Continue Booking
+            </button>
 
-        <div className="flex justify-between">
-          <span>Room Subtotal</span>
-
-          <span>
-            ₹{roomSubtotal.toLocaleString()}
-          </span>
-        </div>
-
-        <div className="flex justify-between">
-
-          <span>Taxes (12%)</span>
-
-          <span>
-            ₹{taxes.toLocaleString()}
-          </span>
-
-        </div>
-
-        <div className="flex justify-between border-t pt-3 text-xl font-bold">
-
-          <span>Total</span>
-
-          <span className="text-[#173D8E]">
-            ₹{total.toLocaleString()}
-          </span>
-
-        </div>
-
-        <button className="mt-4 w-full rounded-lg bg-[#FF6B00] py-4 text-lg font-bold text-white transition hover:bg-[#E65C00]">
-          Book Now · ₹{total.toLocaleString()}
-        </button>
-
-        <p className="text-center text-sm text-gray-500">
-          No payment now • Pay at hotel
-        </p>
-
-      </div>
-
+          </div>
+        </>
+      )}
     </div>
   );
 };

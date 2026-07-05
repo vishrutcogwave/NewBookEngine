@@ -5,6 +5,9 @@ import HotelInfo from "../components/HotelInfo";
 import ImageGallery from "../components/ImageGallery";
 import HotelDescription from "../components/HotelDescription";
 import AvailabilityFilter from "../components/AvailabilityFilter";
+import type { PriceDetail, RatePlan, RoomType } from "../components/RoomList";
+import RoomList from "../components/RoomList";
+import BookingSummary, { type SelectedRoom } from "../components/BookingSummary";
 
 interface HotelResponse {
   Hotel: {
@@ -18,13 +21,15 @@ interface HotelResponse {
       EmailId: string;
     };
   };
+
+  RoomTypes: RoomType[];
 }
 
 const LandingPage = () => {
   const [hotelData, setHotelData] = useState<HotelResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
+const [selectedRooms, setSelectedRooms] = useState<SelectedRoom[]>([]);
 const getToday = () => {
   return new Date().toISOString().split("T")[0]; // yyyy-MM-dd
 };
@@ -86,7 +91,74 @@ console.log("response",response);
   const handleSearch = () => {
     fetchHotelData(checkInDate, checkOutDate);
   };
+const handleBookRoom = (
+  room: RoomType,
+  ratePlan: RatePlan,
+  price: PriceDetail,
+  adults: number,
+  children: number
+) => {
+  setSelectedRooms((prev) => {
+    const existing = prev.find(
+      (x) =>
+        x.RoomTypeId === room.RoomTypeId &&
+        x.RatePlan.RatePlanId === ratePlan.RatePlanId &&
+        x.AdultCount === adults &&
+        x.ChildCount === children
+    );
 
+    if (existing) {
+      return prev.map((item) =>
+        item.RoomTypeId === room.RoomTypeId &&
+        item.RatePlan.RatePlanId === ratePlan.RatePlanId &&
+        item.AdultCount === adults &&
+        item.ChildCount === children
+          ? {
+              ...item,
+              Quantity: item.Quantity + 1,
+            }
+          : item
+      );
+    }
+
+    return [
+      ...prev,
+      {
+        RoomTypeId: room.RoomTypeId,
+        RoomTypeName: room.RoomTypeName,
+        RoomTypeDescription: room.RoomTypeDescription,
+        RoomImages: room.RoomImages,
+        Amenities: room.Amenities,
+
+        Quantity: 1,
+
+        AdultCount: adults,
+        ChildCount: children,
+
+        RatePlan: ratePlan,
+        Price: price,
+      },
+    ];
+  });
+};
+const handleRemoveRoom = (
+  roomTypeId: string,
+  ratePlanId: string,
+  adults: number,
+  children: number
+) => {
+  setSelectedRooms((prev) =>
+    prev.filter(
+      (x) =>
+        !(
+          x.RoomTypeId === roomTypeId &&
+          x.RatePlan.RatePlanId === ratePlanId &&
+          x.AdultCount === adults &&
+          x.ChildCount === children
+        )
+    )
+  );
+};
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gray-100">
@@ -148,9 +220,30 @@ console.log("response",response);
         onSearch={handleSearch}
       />
 
-      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        {/* Next Components */}
-      </main>
+<div className="w-full px-4 py-8 xl:px-8 2xl:px-10">
+  <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_420px]">
+
+    {/* Room List */}
+
+    <div className="min-w-0">
+ <RoomList
+  rooms={hotelData.RoomTypes}
+  selectedRooms={selectedRooms}
+  onBookRoom={handleBookRoom}
+/>
+    </div>
+
+    {/* Booking Summary */}
+
+    <div className="w-full xl:w-[420px]">
+      <BookingSummary
+        rooms={selectedRooms}
+        onRemoveRoom={handleRemoveRoom}
+      />
+    </div>
+
+  </div>
+</div>
     </div>
   );
 };
