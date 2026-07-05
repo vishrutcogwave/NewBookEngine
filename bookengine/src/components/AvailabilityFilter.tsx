@@ -31,7 +31,7 @@ const AvailabilityFilter = ({
 }: AvailabilityFilterProps) => {
   const checkInRef = useRef<HTMLInputElement>(null);
   const checkOutRef = useRef<HTMLInputElement>(null);
-
+const today = new Date().toISOString().split("T")[0];
   return (
     <section className="pb-8">
       <div className="w-full px-5 md:px-10 xl:px-16">
@@ -70,6 +70,7 @@ const AvailabilityFilter = ({
               <input
                 ref={checkInRef}
                 type="date"
+                  min={today}
                 value={checkIn}
                 onChange={(e) => onCheckInChange(e.target.value)}
                 className="absolute left-0 top-0 h-0 w-0 opacity-0"
@@ -111,6 +112,7 @@ const AvailabilityFilter = ({
                 ref={checkOutRef}
                 type="date"
                 value={checkOut}
+                  min={checkIn || today}
                 onChange={(e) => onCheckOutChange(e.target.value)}
                 className="absolute left-0 top-0 h-0 w-0 opacity-0"
               />
