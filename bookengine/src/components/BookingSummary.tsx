@@ -1,5 +1,6 @@
 import { Trash2 } from "lucide-react";
 import type { PriceDetail, RatePlan } from "./RoomList";
+import { useState } from "react";
 
 export interface SelectedRoom {
   RoomTypeId: string;
@@ -19,16 +20,17 @@ export interface SelectedRoom {
 
 interface Props {
   rooms: SelectedRoom[];
-
-  onRemoveRoom: (
-    roomTypeId: string,
-    ratePlanId: string,
-    adults: number,
-    children: number
-  ) => void;
+onRemoveRoom: (
+  roomTypeId: string,
+  ratePlanId: string,
+  adults: number,
+  children: number,
+  removeAll: boolean
+) => void;
 }
 
 const BookingSummary = ({ rooms, onRemoveRoom }: Props) => {
+  const [removeRoom, setRemoveRoom] = useState<SelectedRoom | null>(null);
   const totalRooms = rooms.reduce((sum, room) => sum + room.Quantity, 0);
 
 const totalAmount = rooms.reduce((sum, room) => {
@@ -158,20 +160,25 @@ const totalAmount = rooms.reduce((sum, room) => {
   ).toLocaleString()}
 </p>
 
-                    <button
-                      onClick={() =>
-                        onRemoveRoom(
-                          room.RoomTypeId,
-                          room.RatePlan.RatePlanId,
-                          room.AdultCount,
-                          room.ChildCount
-                        )
-                      }
-                      className="mt-3 flex items-center gap-1 text-sm text-red-600 hover:text-red-700"
-                    >
-                      <Trash2 size={16} />
-                      Remove
-                    </button>
+<button
+  onClick={() => {
+    if (room.Quantity > 1) {
+      setRemoveRoom(room);
+    } else {
+      onRemoveRoom(
+        room.RoomTypeId,
+        room.RatePlan.RatePlanId,
+        room.AdultCount,
+        room.ChildCount,
+        true
+      );
+    }
+  }}
+  className="mt-3 flex items-center gap-1 text-sm text-red-600 hover:text-red-700"
+>
+  <Trash2 size={16} />
+  Remove
+</button>
 
                   </div>
 
@@ -207,6 +214,73 @@ const totalAmount = rooms.reduce((sum, room) => {
           </div>
         </>
       )}
+      {removeRoom && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+    <div className="w-full max-w-sm rounded-xl bg-white p-6 shadow-xl">
+
+      <h3 className="text-lg font-bold">
+        Remove Room
+      </h3>
+
+      <p className="mt-2 text-sm text-gray-600">
+        You have selected{" "}
+        <span className="font-semibold">
+          {removeRoom.Quantity}
+        </span>{" "}
+        rooms.
+      </p>
+
+      <p className="mb-6 text-sm text-gray-600">
+        What would you like to remove?
+      </p>
+
+      <div className="space-y-3">
+
+        <button
+          onClick={() => {
+            onRemoveRoom(
+              removeRoom.RoomTypeId,
+              removeRoom.RatePlan.RatePlanId,
+              removeRoom.AdultCount,
+              removeRoom.ChildCount,
+              false
+            );
+
+            setRemoveRoom(null);
+          }}
+          className="w-full rounded-lg border border-[#173f8a] py-2 font-medium text-[#173f8a] hover:bg-[#173f8a] hover:text-white"
+        >
+          Remove 1 Room
+        </button>
+
+        <button
+          onClick={() => {
+            onRemoveRoom(
+              removeRoom.RoomTypeId,
+              removeRoom.RatePlan.RatePlanId,
+              removeRoom.AdultCount,
+              removeRoom.ChildCount,
+              true
+            );
+
+            setRemoveRoom(null);
+          }}
+          className="w-full rounded-lg bg-red-600 py-2 font-medium text-white hover:bg-red-700"
+        >
+          Remove All Rooms
+        </button>
+
+        <button
+          onClick={() => setRemoveRoom(null)}
+          className="w-full rounded-lg border py-2 hover:bg-gray-100"
+        >
+          Cancel
+        </button>
+
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 };

@@ -145,18 +145,37 @@ const handleRemoveRoom = (
   roomTypeId: string,
   ratePlanId: string,
   adults: number,
-  children: number
+  children: number,
+  removeAll = false
 ) => {
   setSelectedRooms((prev) =>
-    prev.filter(
-      (x) =>
-        !(
-          x.RoomTypeId === roomTypeId &&
-          x.RatePlan.RatePlanId === ratePlanId &&
-          x.AdultCount === adults &&
-          x.ChildCount === children
-        )
-    )
+    prev.flatMap((room) => {
+      const isMatch =
+        room.RoomTypeId === roomTypeId &&
+        room.RatePlan.RatePlanId === ratePlanId &&
+        room.AdultCount === adults &&
+        room.ChildCount === children;
+
+      if (!isMatch) return room;
+
+      // ✅ Remove all rooms
+      if (removeAll) {
+        return [];
+      }
+
+      // ✅ Remove one room if quantity > 1
+      if (room.Quantity > 1) {
+        return [
+          {
+            ...room,
+            Quantity: room.Quantity - 1,
+          },
+        ];
+      }
+
+      // ✅ Quantity is 1, remove completely
+      return [];
+    })
   );
 };
   if (loading) {
