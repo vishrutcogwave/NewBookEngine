@@ -186,14 +186,16 @@ const RoomCard = ({
             {room.RatePlans.map((plan) => {
 const remainingRooms =
   plan.AvailableRoom - bookedRooms;
-              const price =
-                plan.PriceDetails.find(
-                  (x) => x.RatePax === adultCount
-                ) ??
-                plan.PriceDetails[
-                  plan.PriceDetails.length - 1
-                ];
 
+const prices = plan.PriceDetails.flatMap(
+  (x) => x.PriceDetailsDay
+);
+
+const price =
+  prices.find(
+    (x) => x.RatePax === adultCount
+  ) ??
+  prices[prices.length - 1];
               const selected =
                 selectedRatePlan.RatePlanId ===
                 plan.RatePlanId;

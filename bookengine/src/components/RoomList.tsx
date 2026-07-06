@@ -24,6 +24,21 @@ export interface RoomType {
   RatePlans: RatePlan[];
 }
 
+export interface PriceDetail {
+  RatePlanId: string;
+  RoomTypeId: string;
+  RatePax: number;
+  PricePerNight: number;
+  OfferPricePerNight: number;
+  ChildRatePerNight: number;
+  OfferChildRateperNight: number;
+}
+
+export interface RatePlanPrice {
+  ProcessDate: string;
+  PriceDetailsDay: PriceDetail[];
+}
+
 export interface RatePlan {
   RatePlanId: string;
   RateName: string;
@@ -35,15 +50,7 @@ export interface RatePlan {
   Currency: string;
   IsDefaultSelect: boolean;
 
-  PriceDetails: PriceDetail[];
-}
-
-export interface PriceDetail {
-  RatePlanId: string;
-  RoomTypeId: string;
-  RatePax: number;
-  PricePerNight: number;
-  OfferPricePerNight: number;
+  PriceDetails: RatePlanPrice[];
 }
 
 interface RoomListProps {
