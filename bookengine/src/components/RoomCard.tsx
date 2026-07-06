@@ -193,9 +193,13 @@ const prices = plan.PriceDetails.flatMap(
 
 const price =
   prices.find(
-    (x) => x.RatePax === adultCount
-  ) ??
-  prices[prices.length - 1];
+    (x) => x.RatePax === 1
+  ) ?? prices[0];
+
+// Base room price only
+const totalPerNight =
+  price.OfferPricePerNight *
+  room.MaxOccupancy.DefaultAdult;
               const selected =
                 selectedRatePlan.RatePlanId ===
                 plan.RatePlanId;
@@ -258,13 +262,22 @@ const price =
 
   <div className="text-right">
 
-    <h2 className="text-5xl font-bold text-[#1F2D5A]">
-      ₹{price.OfferPricePerNight.toLocaleString()}
-    </h2>
+  <h2 className="text-5xl font-bold text-[#1F2D5A]">
+  ₹{totalPerNight.toLocaleString()}
+</h2>
 
     <p className="mt-1 text-xl text-gray-500">
       / Night
     </p>
+    <p className="mt-1 text-sm text-gray-500">
+  {room.MaxOccupancy.DefaultAdult} Adults Included
+</p>
+
+{childCount > 0 && (
+  <p className="text-sm text-gray-500">
+    + {childCount} Child
+  </p>
+)}
 
     <p className="text-sm text-gray-400">
       (Exclusive of Taxes)

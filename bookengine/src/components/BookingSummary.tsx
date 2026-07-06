@@ -31,11 +31,18 @@ interface Props {
 const BookingSummary = ({ rooms, onRemoveRoom }: Props) => {
   const totalRooms = rooms.reduce((sum, room) => sum + room.Quantity, 0);
 
-  const totalAmount = rooms.reduce(
-    (sum, room) =>
-      sum + room.Price.OfferPricePerNight * room.Quantity,
-    0
+const totalAmount = rooms.reduce((sum, room) => {
+  const roomPrice =
+    room.Price.OfferPricePerNight * room.AdultCount;
+
+  const childPrice =
+    room.Price.ChildRatePerNight * room.ChildCount;
+
+  return (
+    sum +
+    (roomPrice + childPrice) * room.Quantity
   );
+}, 0);
 
   return (
     <div className="sticky top-5 rounded-xl border bg-white shadow-sm">
@@ -118,24 +125,38 @@ const BookingSummary = ({ rooms, onRemoveRoom }: Props) => {
                       </span>
                     </p>
 
-                    <p className="text-xs text-gray-400">
-                      ₹
-                      {room.Price.OfferPricePerNight.toLocaleString()}
-                      {" × "}
-                      {room.Quantity}
-                    </p>
+               <p className="text-xs text-gray-400">
+  Adults :
+  ₹
+  {(room.Price.OfferPricePerNight * room.AdultCount).toLocaleString()}
+</p>
+
+{room.ChildCount > 0 && (
+  <p className="text-xs text-gray-400">
+    Children :
+    ₹
+    {(room.Price.ChildRatePerNight * room.ChildCount).toLocaleString()}
+  </p>
+)}
+
+<p className="text-xs text-gray-400">
+  Qty : {room.Quantity}
+</p>
 
                   </div>
 
                   <div className="text-right">
 
-                    <p className="text-xl font-bold text-[#173f8a]">
-                      ₹
-                      {(
-                        room.Price.OfferPricePerNight *
-                        room.Quantity
-                      ).toLocaleString()}
-                    </p>
+                 <p className="text-xl font-bold text-[#173f8a]">
+  ₹
+  {(
+    (
+      room.Price.OfferPricePerNight * room.AdultCount +
+      room.Price.ChildRatePerNight * room.ChildCount
+    ) *
+    room.Quantity
+  ).toLocaleString()}
+</p>
 
                     <button
                       onClick={() =>
