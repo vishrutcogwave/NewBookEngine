@@ -68,13 +68,13 @@ const RoomCard = ({
 
         {/* IMAGE */}
 
-        <div className="relative">
+   <div className="relative h-full min-h-[700px] overflow-hidden">
 
-          <img
-            src={room.RoomImages[currentImage]}
-            alt={room.RoomTypeName}
-            className="h-[330px] w-full object-cover"
-          />
+  <img
+    src={room.RoomImages[currentImage]}
+    alt={room.RoomTypeName}
+    className="absolute inset-0 h-full w-full object-cover"
+  />
 
           {room.RoomImages.length > 1 && (
             <>
@@ -109,11 +109,21 @@ const RoomCard = ({
             </>
           )}
 
-          {room.Availability.RoomsLeft <= 2 && (
-            <div className="absolute left-4 top-4 rounded-md bg-red-600 px-3 py-1 text-xs font-semibold text-white">
-              Only {room.Availability.RoomsLeft} Left
-            </div>
-          )}
+     <div
+  className={`absolute left-4 top-4 rounded-md px-3 py-1 text-xs font-semibold text-white ${
+    room.Availability.RoomsLeft <= 2
+      ? "bg-red-600"
+      : room.Availability.RoomsLeft <= 5
+      ? "bg-orange-500"
+      : "bg-green-600"
+  }`}
+>
+  {room.Availability.RoomsLeft <= 0
+    ? "Sold Out"
+    : room.Availability.RoomsLeft <= 2
+    ? `Only ${room.Availability.RoomsLeft} Left`
+    : `${room.Availability.RoomsLeft} Rooms Available`}
+</div>
 
         </div>
 
@@ -185,7 +195,7 @@ const RoomCard = ({
 
             {room.RatePlans.map((plan) => {
 const remainingRooms =
-  plan.AvailableRoom - bookedRooms;
+  Math.max(0, room.Availability.RoomsLeft - bookedRooms);
 
 const prices = plan.PriceDetails.flatMap(
   (x) => x.PriceDetailsDay
