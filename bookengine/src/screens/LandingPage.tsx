@@ -8,6 +8,7 @@ import AvailabilityFilter from "../components/AvailabilityFilter";
 import type { PriceDetail, RatePlan, RoomType } from "../components/RoomList";
 import RoomList from "../components/RoomList";
 import BookingSummary, { type SelectedRoom } from "../components/BookingSummary";
+import Footer from "../components/Footer";
 
 interface HotelResponse {
   Hotel: {
@@ -263,6 +264,7 @@ const handleRemoveRoom = (
 
   </div>
 </div>
+<Footer hotelName={Hotel.Name} />
     </div>
   );
 };

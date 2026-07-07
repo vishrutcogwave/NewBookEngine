@@ -17,3 +17,71 @@ export const getHotelData = async (params: HotelDataParams) => {
 
   return data;
 };
+
+
+
+
+export const getHotelPolicy = async (
+  propertyid: string,
+  HotelID: string,
+  Branchcode: string
+) => {
+  const { data } = await api.get(ENDPOINTS.GET_HOTEL_POLICY, {
+    params: {
+      propertyid,
+      HotelID,
+      Branchcode,
+    },
+  });
+
+  return data;
+};
+
+
+export const getHotelTerms = async (
+  propertyid: string,
+  HotelID: string,
+  Branchcode: string
+) => {
+  const { data } = await api.get(ENDPOINTS.GET_HOTEL_TERMS, {
+    params: {
+      propertyid,
+      HotelID,
+      Branchcode,
+    },
+  });
+
+  return data;
+};
+
+export const getHotelRefundPolicy = async (
+  propertyid: string,
+  HotelID: string,
+  Branchcode: string
+) => {
+  const { data } = await api.get(ENDPOINTS.GET_HOTEL_REFUND_POLICY, {
+    params: {
+      propertyid,
+      HotelID,
+      Branchcode,
+    },
+  });
+
+  return data;
+};
+
+export const getHotelContact = async (
+  propertyid: string,
+  HotelID: string,
+  Branchcode: string
+) => {
+  const { data } = await api.get(ENDPOINTS.GET_HOTEL_CONTACT, {
+    params: {
+      propertyid,
+      HotelID,
+      Branchcode,
+    },
+  });
+
+  return data;
+};
