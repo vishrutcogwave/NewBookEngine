@@ -31,19 +31,31 @@ onRemoveRoom: (
 
 const BookingSummary = ({ rooms, onRemoveRoom }: Props) => {
   const [removeRoom, setRemoveRoom] = useState<SelectedRoom | null>(null);
+  const getRoomTotal = (room: SelectedRoom) => {
+  let total = 0;
+
+  room.RatePlan.PriceDetails.forEach((day) => {
+    const prices = day.Prices?.[0];
+    if (!prices) return;
+
+    const pax =
+      prices[room.AdultCount.toString()];
+
+    if (!pax) return;
+
+    total +=
+      pax.AdultPrice +
+      pax.ChildPrice * room.ChildCount;
+  });
+
+  return total * room.Quantity;
+};
   const totalRooms = rooms.reduce((sum, room) => sum + room.Quantity, 0);
 
-const totalAmount = rooms.reduce((sum, room) => {
-const roomPrice = room.Price.OfferPricePerNight;
-
-const childPrice =
-  room.Price.ChildRatePerNight * room.ChildCount;
-
-return (
-  sum +
-  (roomPrice + childPrice) * room.Quantity
+const totalAmount = rooms.reduce(
+  (sum, room) => sum + getRoomTotal(room),
+  0
 );
-}, 0);
 
   return (
     <div className="sticky top-5 rounded-xl border bg-white shadow-sm">
@@ -141,6 +153,11 @@ return (
 )}
 
 <p className="text-xs text-gray-400">
+  {room.RatePlan.PriceDetails.length} Night
+  {room.RatePlan.PriceDetails.length > 1 ? "s" : ""}
+</p>
+
+<p className="text-xs text-gray-400">
   Qty : {room.Quantity}
 </p>
 
@@ -149,13 +166,7 @@ return (
                   <div className="text-right">
 
                  <p className="text-xl font-bold text-[#173f8a]">
-  ₹
-  {(
-(
-  room.Price.OfferPricePerNight +
-  room.Price.ChildRatePerNight * room.ChildCount
-) * room.Quantity
-  ).toLocaleString()}
+ ₹{getRoomTotal(room).toLocaleString()}
 </p>
 
 <button
