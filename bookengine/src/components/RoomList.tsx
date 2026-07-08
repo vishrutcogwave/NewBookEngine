@@ -34,9 +34,14 @@ export interface PriceDetail {
   OfferChildRateperNight: number;
 }
 
+export interface PaxPrice {
+  AdultPrice: number;
+  ChildPrice: number;
+}
+
 export interface RatePlanPrice {
   ProcessDate: string;
-  PriceDetailsDay: PriceDetail[];
+  Prices: Record<string, PaxPrice>[];
 }
 
 export interface RatePlan {

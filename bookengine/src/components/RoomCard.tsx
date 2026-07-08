@@ -196,20 +196,18 @@ const RoomCard = ({
             {room.RatePlans.map((plan) => {
 const remainingRooms =
   Math.max(0, room.Availability.RoomsLeft - bookedRooms);
+const paxPrices = plan.PriceDetails?.[0]?.Prices?.[0] || {};
 
-const prices = plan.PriceDetails.flatMap(
-  (x) => x.PriceDetailsDay
-);
+// Always show Default Adult price on the card
+const defaultPrice =
+  paxPrices[room.MaxOccupancy.DefaultAdult.toString()];
 
-const price =
-  prices.find(
-    (x) => x.RatePax === 1
-  ) ?? prices[0];
+const totalPerNight = defaultPrice?.AdultPrice ?? 0;
+// ADD THIS
+const bookingPrice =
+  paxPrices[adultCount.toString()] ??
+  defaultPrice;
 
-// Base room price only
-const totalPerNight =
-  price.OfferPricePerNight *
-  room.MaxOccupancy.DefaultAdult;
               const selected =
                 selectedRatePlan.RatePlanId ===
                 plan.RatePlanId;
@@ -272,15 +270,15 @@ const totalPerNight =
 
   <div className="text-right">
 
-  <h2 className="text-5xl font-bold text-[#1F2D5A]">
+<h2 className="text-5xl font-bold text-[#1F2D5A]">
   ₹{totalPerNight.toLocaleString()}
 </h2>
 
     <p className="mt-1 text-xl text-gray-500">
       / Night
     </p>
-    <p className="mt-1 text-sm text-gray-500">
-  {room.MaxOccupancy.DefaultAdult} Adults Included
+<p className="mt-1 text-sm text-gray-500">
+  {adultCount} Adult{adultCount > 1 ? "s" : ""} Included
 </p>
 
 {childCount > 0 && (
@@ -424,13 +422,21 @@ const totalPerNight =
                         onClick={(e) => {
                           e.stopPropagation();
 
-                          onBookRoom(
-                            room,
-                            plan,
-                            price,
-                            adultCount,
-                            childCount
-                          );
+onBookRoom(
+  room,
+  plan,
+  {
+    RatePlanId: plan.RatePlanId,
+    RoomTypeId: room.RoomTypeId,
+    RatePax: adultCount,
+    PricePerNight: bookingPrice?.AdultPrice ?? 0,
+    OfferPricePerNight: bookingPrice?.AdultPrice ?? 0,
+    ChildRatePerNight: bookingPrice?.ChildPrice ?? 0,
+    OfferChildRateperNight: bookingPrice?.ChildPrice ?? 0,
+  },
+  adultCount,
+  childCount
+);
                         }}
                         disabled={remainingRooms <= 0}
 

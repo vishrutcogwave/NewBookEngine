@@ -34,16 +34,15 @@ const BookingSummary = ({ rooms, onRemoveRoom }: Props) => {
   const totalRooms = rooms.reduce((sum, room) => sum + room.Quantity, 0);
 
 const totalAmount = rooms.reduce((sum, room) => {
-  const roomPrice =
-    room.Price.OfferPricePerNight * room.AdultCount;
+const roomPrice = room.Price.OfferPricePerNight;
 
-  const childPrice =
-    room.Price.ChildRatePerNight * room.ChildCount;
+const childPrice =
+  room.Price.ChildRatePerNight * room.ChildCount;
 
-  return (
-    sum +
-    (roomPrice + childPrice) * room.Quantity
-  );
+return (
+  sum +
+  (roomPrice + childPrice) * room.Quantity
+);
 }, 0);
 
   return (
@@ -129,8 +128,8 @@ const totalAmount = rooms.reduce((sum, room) => {
 
                <p className="text-xs text-gray-400">
   Adults :
-  ₹
-  {(room.Price.OfferPricePerNight * room.AdultCount).toLocaleString()}
+₹
+{room.Price.OfferPricePerNight.toLocaleString()}
 </p>
 
 {room.ChildCount > 0 && (
@@ -152,11 +151,10 @@ const totalAmount = rooms.reduce((sum, room) => {
                  <p className="text-xl font-bold text-[#173f8a]">
   ₹
   {(
-    (
-      room.Price.OfferPricePerNight * room.AdultCount +
-      room.Price.ChildRatePerNight * room.ChildCount
-    ) *
-    room.Quantity
+(
+  room.Price.OfferPricePerNight +
+  room.Price.ChildRatePerNight * room.ChildCount
+) * room.Quantity
   ).toLocaleString()}
 </p>
 
