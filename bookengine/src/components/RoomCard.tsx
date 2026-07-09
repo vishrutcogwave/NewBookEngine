@@ -204,9 +204,14 @@ const defaultPrice =
 
 const totalPerNight = defaultPrice?.AdultPrice ?? 0;
 // ADD THIS
-const bookingPrice =
+const adultPrice =
   paxPrices[adultCount.toString()] ??
   defaultPrice;
+
+const childPrice =
+  childCount > 0
+    ? paxPrices[childCount.toString()] ?? defaultPrice
+    : { ChildPrice: 0 };
 
               const selected =
                 selectedRatePlan.RatePlanId ===
@@ -429,10 +434,10 @@ onBookRoom(
     RatePlanId: plan.RatePlanId,
     RoomTypeId: room.RoomTypeId,
     RatePax: adultCount,
-    PricePerNight: bookingPrice?.AdultPrice ?? 0,
-    OfferPricePerNight: bookingPrice?.AdultPrice ?? 0,
-    ChildRatePerNight: bookingPrice?.ChildPrice ?? 0,
-    OfferChildRateperNight: bookingPrice?.ChildPrice ?? 0,
+   PricePerNight: adultPrice?.AdultPrice ?? 0,
+OfferPricePerNight: adultPrice?.AdultPrice ?? 0,
+ChildRatePerNight: childPrice?.ChildPrice ?? 0,
+OfferChildRateperNight: childPrice?.ChildPrice ?? 0,
   },
   adultCount,
   childCount

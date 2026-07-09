@@ -38,14 +38,17 @@ const BookingSummary = ({ rooms, onRemoveRoom }: Props) => {
     const prices = day.Prices?.[0];
     if (!prices) return;
 
-    const pax =
-      prices[room.AdultCount.toString()];
+const adultPax = prices[room.AdultCount.toString()];
+const childPax =
+  room.ChildCount > 0
+    ? prices[room.ChildCount.toString()]
+    : null;
 
-    if (!pax) return;
+if (!adultPax) return;
 
-    total +=
-      pax.AdultPrice +
-      pax.ChildPrice * room.ChildCount;
+total +=
+  adultPax.AdultPrice +
+  (childPax?.ChildPrice ?? 0) * room.ChildCount;
   });
 
   return total * room.Quantity;
