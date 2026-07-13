@@ -68,13 +68,7 @@ onBookRoom: (
   adults: number,
   children: number
 ) => void;
-onRemoveRoom: (
-  roomTypeId: string,
-  ratePlanId: string,
-  adults: number,
-  children: number,
-  removeAll: boolean
-) => void;
+onRemoveRoom: (roomId: string) => void;
 }
 
 const RoomList = ({

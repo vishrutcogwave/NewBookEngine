@@ -27,13 +27,7 @@ interface Props {
     roomId?: string
   ) => void;
 
-  onRemoveRoom: (
-    roomTypeId: string,
-    ratePlanId: string,
-    adults: number,
-    children: number,
-    removeAll: boolean
-  ) => void;
+onRemoveRoom: (roomId: string) => void;
 }
 
 const RoomCard = ({
@@ -614,13 +608,7 @@ onBookRoom(
   }));
 
   // Remove from Booking Summary
-  onRemoveRoom(
-    room.RoomTypeId,
-    plan.RatePlanId,
-    item.adults,
-    item.children,
-    true
-  );
+onRemoveRoom(item.id);
 }}
           className="flex h-10 w-10 items-center justify-center rounded-full border border-red-300 text-red-500"
         >

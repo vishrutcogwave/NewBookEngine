@@ -156,41 +156,9 @@ return [
 ];
   });
 };
-const handleRemoveRoom = (
-  roomTypeId: string,
-  ratePlanId: string,
-  adults: number,
-  children: number,
-  removeAll = false
-) => {
+const handleRemoveRoom = (roomId: string) => {
   setSelectedRooms((prev) =>
-    prev.flatMap((room) => {
-      const isMatch =
-        room.RoomTypeId === roomTypeId &&
-        room.RatePlan.RatePlanId === ratePlanId &&
-        room.AdultCount === adults &&
-        room.ChildCount === children;
-
-      if (!isMatch) return room;
-
-      // ✅ Remove all rooms
-      if (removeAll) {
-        return [];
-      }
-
-      // ✅ Remove one room if quantity > 1
-      if (room.Quantity > 1) {
-        return [
-          {
-            ...room,
-            Quantity: room.Quantity - 1,
-          },
-        ];
-      }
-
-      // ✅ Quantity is 1, remove completely
-      return [];
-    })
+    prev.filter((room) => room.RoomId !== roomId)
   );
 };
 const handleContinueBooking = () => {
