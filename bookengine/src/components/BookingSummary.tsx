@@ -1,318 +1,289 @@
-import { Trash2 } from "lucide-react";
-import type { PriceDetail, RatePlan } from "./RoomList";
-import { useState } from "react";
+  import type { PriceDetail, RatePlan } from "./RoomList";
+  import { useEffect, useState } from "react";
+  import { getTaxAmount } from "../api/hotel.service";
 
-export interface SelectedRoom {
+  export interface SelectedRoom {
     RoomId: string;
-    
-  RoomTypeId: string;
-  RoomTypeName: string;
-  RoomTypeDescription: string;
-  RoomImages: string[];
-  Amenities: string[];
 
-  Quantity: number;
+    RoomTypeId: string;
+    RoomTypeName: string;
+    RoomTypeDescription: string;
+    RoomImages: string[];
+    Amenities: string[];
 
-  AdultCount: number;
-  ChildCount: number;
+    Quantity: number;
 
-  RatePlan: RatePlan;
-  Price: PriceDetail;
-}
+    AdultCount: number;
+    ChildCount: number;
 
-interface Props {
-  rooms: SelectedRoom[];
+    RatePlan: RatePlan;
+    Price: PriceDetail;
+  }
 
-  onRemoveRoom?: (
-    roomTypeId: string,
-    ratePlanId: string,
-    adults: number,
-    children: number,
-    removeAll: boolean
-  ) => void;
+  interface Props {
+    rooms: SelectedRoom[];
 
-  readOnly?: boolean;
+    onRemoveRoom?: (
+      roomTypeId: string,
+      ratePlanId: string,
+      adults: number,
+      children: number,
+      removeAll: boolean,
+    ) => void;
 
-  onContinue?: () => void;
-}
+    readOnly?: boolean;
 
-const BookingSummary = ({
-  rooms,
-  onRemoveRoom,
-  readOnly = false,
-  onContinue
-}: Props) => {
-  const [removeRoom, setRemoveRoom] = useState<SelectedRoom | null>(null);
-  const getRoomTotal = (room: SelectedRoom) => {
-  let total = 0;
+    onContinue?: () => void;
+  }
 
-  room.RatePlan.PriceDetails.forEach((day) => {
-    const prices = day.Prices?.[0];
-    if (!prices) return;
+  const BookingSummary = ({
+    rooms,
+    readOnly = false,
+    onContinue,
+  }: Props) => {
+    const [roomTaxes, setRoomTaxes] = useState<
+      Record<
+        string,
+        {
+          taxDetails: any[];
+          taxAmount: number;
+        }
+      >
+    >({});
 
-const adultPax = prices[room.AdultCount.toString()];
-const childPax =
-  room.ChildCount > 0
-    ? prices[room.ChildCount.toString()]
-    : null;
+    const getRoomTotal = (room: SelectedRoom) => {
+      let total = 0;
 
-if (!adultPax) return;
+      room.RatePlan.PriceDetails.forEach((day) => {
+        const prices = day.Prices?.[0];
+        if (!prices) return;
 
-total +=
-  adultPax.AdultPrice +
-  (childPax?.ChildPrice ?? 0) * room.ChildCount;
-  });
+        const adultPax = prices[room.AdultCount.toString()];
+        const childPax =
+          room.ChildCount > 0 ? prices[room.ChildCount.toString()] : null;
 
-  return total * room.Quantity;
-};
-  const totalRooms = rooms.reduce((sum, room) => sum + room.Quantity, 0);
+        if (!adultPax) return;
 
-const totalAmount = rooms.reduce(
-  (sum, room) => sum + getRoomTotal(room),
-  0
-);
+        total +=
+          adultPax.AdultPrice + (childPax?.ChildPrice ?? 0) * room.ChildCount;
+      });
 
-  return (
-    <div className="sticky top-5 rounded-xl border bg-white shadow-sm">
+      return total * room.Quantity;
+    };
+    const totalRooms = rooms.reduce((sum, room) => sum + room.Quantity, 0);
 
-      <div className="border-b p-5">
-        <h2 className="text-xl font-bold">
-          Booking Summary
-        </h2>
+    const totalAmount = rooms.reduce((sum, room) => sum + getRoomTotal(room), 0);
+    useEffect(() => {
+      if (rooms.length === 0) {
+        setRoomTaxes({});
+        return;
+      }
 
-        <p className="mt-1 text-sm text-gray-500">
-          {totalRooms} Room{totalRooms !== 1 ? "s" : ""} Selected
-        </p>
-      </div>
+      const fetchTaxes = async () => {
+        const taxes: Record<
+          string,
+          {
+            taxDetails: any[];
+            taxAmount: number;
+          }
+        > = {};
 
-      {rooms.length === 0 ? (
-        <div className="p-10 text-center">
-          <p className="text-gray-500">
-            No rooms selected
+        for (const room of rooms) {
+          const roomTotal = getRoomTotal(room);
+
+          try {
+            const response = await getTaxAmount({
+              propertyid: "10001",
+              HotelID: "FALC_1001",
+              Branchcode: "HMS_1001",
+              amount: roomTotal,
+            });
+
+            const totalTax = response.reduce(
+              (sum: number, item: any) => sum + Number(item.TaxVaue),
+              0,
+            );
+
+            const key = `${room.RoomTypeId}-${room.RatePlan.RatePlanId}-${room.AdultCount}-${room.ChildCount}`;
+
+            taxes[key] = {
+              taxDetails: response,
+              taxAmount: totalTax,
+            };
+          } catch (err) {
+            console.error(err);
+          }
+        }
+
+        setRoomTaxes(taxes);
+      };
+
+      fetchTaxes();
+    }, [rooms]);
+    const taxAmount = Object.values(roomTaxes).reduce(
+      (sum, room) => sum + room.taxAmount,
+      0,
+    );
+
+    const finalAmount = totalAmount + taxAmount;
+    return (
+      <div className="sticky top-5 rounded-xl border bg-white shadow-sm">
+        <div className="border-b p-5">
+          <h2 className="text-xl font-bold">Booking Summary</h2>
+
+          <p className="mt-1 text-sm text-gray-500">
+            {totalRooms} Room{totalRooms !== 1 ? "s" : ""} Selected
           </p>
         </div>
-      ) : (
-        <>
-          <div className="max-h-[520px] overflow-y-auto">
 
-            {rooms.map((room) => (
-              <div
-                key={`${room.RoomTypeId}-${room.RatePlan.RatePlanId}-${room.AdultCount}-${room.ChildCount}`}
-                className="border-b p-4"
-              >
-                <img
-                  src={room.RoomImages[0]}
-                  className="h-32 w-full rounded-lg object-cover"
-                  alt={room.RoomTypeName}
-                />
+        {rooms.length === 0 ? (
+          <div className="p-10 text-center">
+            <p className="text-gray-500">No rooms selected</p>
+          </div>
+        ) : (
+          <>
+            <div className="max-h-[520px] overflow-y-auto">
+              {rooms.map((room) => (
+                <div
+                  key={`${room.RoomTypeId}-${room.RatePlan.RatePlanId}-${room.AdultCount}-${room.ChildCount}`}
+                  className="border-b p-4"
+                >
+                  <img
+                    src={room.RoomImages[0]}
+                    className="h-32 w-full rounded-lg object-cover"
+                    alt={room.RoomTypeName}
+                  />
 
-                <h3 className="mt-3 text-lg font-semibold">
-                  {room.RoomTypeName}
-                </h3>
+                  <h3 className="mt-3 text-lg font-semibold">
+                    {room.RoomTypeName}
+                  </h3>
 
-                <p className="text-sm text-gray-500">
-                  {room.RatePlan.RateShortName}
-                </p>
+                  <p className="text-sm text-gray-500">
+                    {room.RatePlan.RateShortName}
+                  </p>
 
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {room.Amenities.slice(0, 3).map((item) => (
-                    <span
-                      key={item}
-                      className="rounded-full bg-gray-100 px-2 py-1 text-xs"
-                    >
-                      {item}
-                    </span>
-                  ))}
-                </div>
-
-                <div className="mt-3 flex items-center justify-between">
-
-                  <div>
-
-                    <p className="text-sm text-gray-600">
-                      Adults :
-                      <span className="font-medium">
-                        {" "}
-                        {room.AdultCount}
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {room.Amenities.slice(0, 3).map((item) => (
+                      <span
+                        key={item}
+                        className="rounded-full bg-gray-100 px-2 py-1 text-xs"
+                      >
+                        {item}
                       </span>
-                    </p>
-
-                    <p className="text-sm text-gray-600">
-                      Children :
-                      <span className="font-medium">
-                        {" "}
-                        {room.ChildCount}
-                      </span>
-                    </p>
-
-                    <p className="text-sm text-gray-600">
-                      Quantity :
-                      <span className="font-medium">
-                        {" "}
-                        {room.Quantity}
-                      </span>
-                    </p>
-
-               <p className="text-xs text-gray-400">
-  Adults :
-₹
-{room.Price.OfferPricePerNight.toLocaleString()}
-</p>
-
-{room.ChildCount > 0 && (
-  <p className="text-xs text-gray-400">
-    Children :
-    ₹
-    {(room.Price.ChildRatePerNight * room.ChildCount).toLocaleString()}
-  </p>
-)}
-
-<p className="text-xs text-gray-400">
-  {room.RatePlan.PriceDetails.length} Night
-  {room.RatePlan.PriceDetails.length > 1 ? "s" : ""}
-</p>
-
-<p className="text-xs text-gray-400">
-  Qty : {room.Quantity}
-</p>
-
+                    ))}
                   </div>
 
-                  <div className="text-right">
+                  <div className="mt-3 flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-gray-600">
+                        Adults :
+                        <span className="font-medium"> {room.AdultCount}</span>
+                      </p>
 
-                 <p className="text-xl font-bold text-[#173f8a]">
- ₹{getRoomTotal(room).toLocaleString()}
-</p>
+                      <p className="text-sm text-gray-600">
+                        Children :
+                        <span className="font-medium"> {room.ChildCount}</span>
+                      </p>
 
-{!readOnly && onRemoveRoom && (
-  <button
-    onClick={() => {
-      if (room.Quantity > 1) {
-        setRemoveRoom(room);
-      } else {
-        onRemoveRoom(
-          room.RoomTypeId,
-          room.RatePlan.RatePlanId,
-          room.AdultCount,
-          room.ChildCount,
-          true
-        );
-      }
-    }}
-    className="mt-3 flex items-center gap-1 text-sm text-red-600 hover:text-red-700"
-  >
-    <Trash2 size={16} />
-    Remove
-  </button>
-)}
+                      <p className="text-sm text-gray-600">
+                        Quantity :
+                        <span className="font-medium"> {room.Quantity}</span>
+                      </p>
 
+                      <p className="text-xs text-gray-400">
+                        Adults : ₹{room.Price.OfferPricePerNight.toLocaleString()}
+                      </p>
+
+                      {room.ChildCount > 0 && (
+                        <p className="text-xs text-gray-400">
+                          Children : ₹
+                          {(
+                            room.Price.ChildRatePerNight * room.ChildCount
+                          ).toLocaleString()}
+                        </p>
+                      )}
+
+                      <p className="text-xs text-gray-400">
+                        {room.RatePlan.PriceDetails.length} Night
+                        {room.RatePlan.PriceDetails.length > 1 ? "s" : ""}
+                      </p>
+
+                      <p className="text-xs text-gray-400">
+                        Qty : {room.Quantity}
+                      </p>
+                    </div>
+
+                    <div className="text-right">
+                      {(() => {
+                        const key = `${room.RoomTypeId}-${room.RatePlan.RatePlanId}-${room.AdultCount}-${room.ChildCount}`;
+                        const roomTax = roomTaxes[key];
+
+                        return (
+                          <>
+                            <p className="text-xl font-bold text-[#173f8a]">
+                              ₹{getRoomTotal(room).toLocaleString()}
+                            </p>
+
+                            {roomTax?.taxDetails.map((tax) => (
+                              <p
+                                key={tax.TaxName}
+                                className="text-xs text-gray-500"
+                              >
+                                {tax.TaxName} ({tax.TaxPer}%): ₹{tax.TaxVaue}
+                              </p>
+                            ))}
+
+                            <p className="text-sm font-semibold text-green-700">
+                              Total: ₹
+                              {(
+                                getRoomTotal(room) + (roomTax?.taxAmount ?? 0)
+                              ).toLocaleString()}
+                            </p>
+                          </>
+                        );
+                      })()}
+
+              
+                    </div>
                   </div>
-
                 </div>
-
+              ))}
+            </div>
+            <div className="space-y-3 border-t p-5">
+              <div className="flex justify-between">
+                <span>Total Rooms</span>
+                <span className="font-semibold">{totalRooms}</span>
               </div>
-            ))}
 
-          </div>
+              <div className="flex justify-between">
+                <span>Room Amount</span>
+                <span className="font-semibold">
+                  ₹{totalAmount.toLocaleString()}
+                </span>
+              </div>
 
-          <div className="space-y-3 border-t p-5">
+              <div className="border-t pt-3 flex justify-between">
+                <span className="text-lg font-bold">Final Amount</span>
 
-            <div className="flex justify-between">
-              <span>Total Rooms</span>
+                <span className="text-2xl font-bold text-[#173f8a]">
+                  ₹{finalAmount.toLocaleString()}
+                </span>
+              </div>
 
-              <span className="font-semibold">
-                {totalRooms}
-              </span>
+              {!readOnly && (
+                <button
+                  onClick={() => onContinue?.()}
+                  className="w-full rounded-lg bg-[#173f8a] py-3 font-semibold text-white hover:bg-[#102f6c]"
+                >
+                  Continue Booking
+                </button>
+              )}
             </div>
-
-            <div className="flex justify-between">
-              <span>Total Amount</span>
-
-              <span className="text-2xl font-bold text-[#173f8a]">
-                ₹{totalAmount.toLocaleString()}
-              </span>
-            </div>
-
-{!readOnly && (
-  <button
-  onClick={() => onContinue?.()}
-    className="w-full rounded-lg bg-[#173f8a] py-3 font-semibold text-white hover:bg-[#102f6c]"
-  >
-    Continue Booking
-  </button>
-)}
-          </div>
-        </>
-      )}
-  {!readOnly && removeRoom && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
-    <div className="w-full max-w-sm rounded-xl bg-white p-6 shadow-xl">
-
-      <h3 className="text-lg font-bold">
-        Remove Room
-      </h3>
-
-      <p className="mt-2 text-sm text-gray-600">
-        You have selected{" "}
-        <span className="font-semibold">
-          {removeRoom.Quantity}
-        </span>{" "}
-        rooms.
-      </p>
-
-      <p className="mb-6 text-sm text-gray-600">
-        What would you like to remove?
-      </p>
-
-      <div className="space-y-3">
-
-        <button
-         onClick={() => {
-  onRemoveRoom?.(
-    removeRoom.RoomTypeId,
-    removeRoom.RatePlan.RatePlanId,
-    removeRoom.AdultCount,
-    removeRoom.ChildCount,
-    false
-  );
-
-  setRemoveRoom(null);
-}}
-          className="w-full rounded-lg border border-[#173f8a] py-2 font-medium text-[#173f8a] hover:bg-[#173f8a] hover:text-white"
-        >
-          Remove 1 Room
-        </button>
-
-        <button
-       onClick={() => {
-  onRemoveRoom?.(
-    removeRoom.RoomTypeId,
-    removeRoom.RatePlan.RatePlanId,
-    removeRoom.AdultCount,
-    removeRoom.ChildCount,
-    true
-  );
-
-  setRemoveRoom(null);
-}}
-          className="w-full rounded-lg bg-red-600 py-2 font-medium text-white hover:bg-red-700"
-        >
-          Remove All Rooms
-        </button>
-
-        <button
-          onClick={() => setRemoveRoom(null)}
-          className="w-full rounded-lg border py-2 hover:bg-gray-100"
-        >
-          Cancel
-        </button>
-
+          </>
+        )}
+       
       </div>
-    </div>
-  </div>
-)}
-    </div>
-  );
-};
+    );
+  };
 
-export default BookingSummary;
+  export default BookingSummary;

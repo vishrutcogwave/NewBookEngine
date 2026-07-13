@@ -85,3 +85,27 @@ export const getHotelContact = async (
 
   return data;
 };
+export interface TaxAmountParams {
+  propertyid: string;
+  HotelID: string;
+  Branchcode: string;
+  amount: number;
+}
+
+export const getTaxAmount = async ({
+  propertyid,
+  HotelID,
+  Branchcode,
+  amount,
+}: TaxAmountParams) => {
+  const { data } = await api.get(ENDPOINTS.GET_TAX_AMOUNT, {
+    params: {
+      propertyid,
+      HotelID,
+      Branchcode,
+      amount,
+    },
+  });
+
+  return data;
+};
