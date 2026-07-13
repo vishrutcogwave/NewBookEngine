@@ -109,3 +109,64 @@ export const getTaxAmount = async ({
 
   return data;
 };
+
+
+
+
+
+
+
+export interface CreatePhonePePaymentParams {
+  Amount: number;
+  RedirectURL: string;
+  branchcode: string;
+  Propertycode: string;
+  HotelId: string;
+}
+
+export const createPhonePePayment = async ({
+  Amount,
+  RedirectURL,
+  branchcode,
+  Propertycode,
+  HotelId,
+}: CreatePhonePePaymentParams) => {
+  const { data } = await api.get(ENDPOINTS.CREATE_PHONEPE_PAYMENT, {
+    params: {
+      Amount,
+      RedirectURL,
+      branchcode,
+      Propertycode,
+      HotelId,
+    },
+  });
+
+  return data;
+};
+
+
+
+export interface PhonePePaymentStatusParams {
+  MerchantorderID: string;
+  branchcode: string;
+  Propertycode: string;
+  HotelId: string;
+}
+
+export const getPhonePePaymentStatus = async ({
+  MerchantorderID,
+  branchcode,
+  Propertycode,
+  HotelId,
+}: PhonePePaymentStatusParams) => {
+  const { data } = await api.get(ENDPOINTS.PHONEPE_PAYMENT_STATUS, {
+    params: {
+      MerchantorderID,
+      branchcode,
+      Propertycode,
+      HotelId,
+    },
+  });
+
+  return data;
+};
