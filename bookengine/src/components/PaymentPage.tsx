@@ -6,6 +6,7 @@ import BookingSummary, {
 } from "./BookingSummary";
 import GuestDetails from "./GuestDetails";
 import HotelPolicies from "./HotelPolicies";
+import { createPhonePePayment } from "../api/hotel.service";
 
 const PaymentPage = () => {
   const location = useLocation();
@@ -123,7 +124,40 @@ const PaymentPage = () => {
     console.log("Guest:", guest);
     console.log("Rooms:", rooms);
     console.log("Amount:", totalAmount);
+try {
+  const response = await createPhonePePayment({
+  Amount: Math.round(totalAmount * 100),
+RedirectURL: `${window.location.origin}/#/payment-success`,
+    branchcode: "HMS_1001",
+    Propertycode: "10001",
+    HotelId: "FALC_1001",
+  });
 
+  console.log("PhonePe Response:", response);
+ sessionStorage.setItem('merchantOrderId', response?.merchantOrderId);
+  // If API returns payment URL
+  if (response?.PaymentURL) {
+    window.location.href = response.PaymentURL;
+    return;
+  }
+
+  // If API returns redirectUrl
+  if (response?.redirectUrl) {
+    window.location.href = response.redirectUrl;
+    return;
+  }
+
+  // If API returns url
+  if (response?.url) {
+    window.location.href = response.url;
+    return;
+  }
+
+  console.warn("Unexpected payment response:", response);
+} catch (error) {
+  console.error("Payment API Error:", error);
+  alert("Unable to initiate payment. Please try again.");
+}
     // Call Payment API here
   };
 

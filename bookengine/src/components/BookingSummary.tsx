@@ -41,6 +41,8 @@
     readOnly = false,
     onContinue,
   }: Props) => {
+    console.log("rooms",rooms);
+    
     const [roomTaxes, setRoomTaxes] = useState<
       Record<
         string,

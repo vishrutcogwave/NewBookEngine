@@ -5,6 +5,7 @@ import TermsConditions from "./screens/TermsConditions";
 import RefundPolicy from "./screens/RefundPolicy";
 import ContactUs from "./screens/ContactUs";
 import PaymentPage from "./components/PaymentPage";
+import PaymentSuccess from "./components/PaymentSuccess";
 
 function App() {
   return (
@@ -16,6 +17,10 @@ function App() {
          <Route path="/refund-policy" element={<RefundPolicy />} />
            <Route path="/contact-us" element={<ContactUs />} />
                <Route path="/payment" element={<PaymentPage />} />
+               <Route
+  path="/payment-success"
+  element={<PaymentSuccess />}
+/>
       </Routes>
     </HashRouter>
   );
