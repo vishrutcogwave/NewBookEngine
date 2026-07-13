@@ -68,12 +68,20 @@ onBookRoom: (
   adults: number,
   children: number
 ) => void;
+onRemoveRoom: (
+  roomTypeId: string,
+  ratePlanId: string,
+  adults: number,
+  children: number,
+  removeAll: boolean
+) => void;
 }
 
 const RoomList = ({
   rooms,
   selectedRooms,
   onBookRoom,
+  onRemoveRoom
 }: RoomListProps) => {
   if (!rooms || rooms.length === 0) {
     return (
@@ -101,12 +109,13 @@ const RoomList = ({
     .reduce((sum, x) => sum + x.Quantity, 0);
 
   return (
-    <RoomCard
-      key={room.RoomTypeId}
-      room={room}
-      bookedRooms={bookedRooms}
-      onBookRoom={onBookRoom}
-    />
+  <RoomCard
+  key={room.RoomTypeId}
+  room={room}
+  bookedRooms={bookedRooms}
+  onBookRoom={onBookRoom}
+  onRemoveRoom={onRemoveRoom}
+/>
   );
 })}
     </div>

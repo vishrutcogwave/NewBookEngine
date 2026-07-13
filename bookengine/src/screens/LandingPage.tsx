@@ -283,10 +283,11 @@ const handleContinueBooking = () => {
     {/* Room List */}
 
     <div className="min-w-0">
- <RoomList
+<RoomList
   rooms={hotelData.RoomTypes}
   selectedRooms={selectedRooms}
   onBookRoom={handleBookRoom}
+  onRemoveRoom={handleRemoveRoom}
 />
     </div>
 

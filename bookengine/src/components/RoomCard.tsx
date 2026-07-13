@@ -16,23 +16,31 @@ import type {
 
 interface Props {
   room: RoomType;
-
   bookedRooms: number;
 
-onBookRoom: (
-  room: RoomType,
-  ratePlan: RatePlan,
-  price: PriceDetail,
-  adults: number,
-  children: number,
-  roomId?: string
-) => void;
+  onBookRoom: (
+    room: RoomType,
+    ratePlan: RatePlan,
+    price: PriceDetail,
+    adults: number,
+    children: number,
+    roomId?: string
+  ) => void;
+
+  onRemoveRoom: (
+    roomTypeId: string,
+    ratePlanId: string,
+    adults: number,
+    children: number,
+    removeAll: boolean
+  ) => void;
 }
 
 const RoomCard = ({
   room,
   bookedRooms,
   onBookRoom,
+  onRemoveRoom
 }: Props) => {
   const [currentImage, setCurrentImage] = useState(0);
 
@@ -599,14 +607,24 @@ onBookRoom(
 
         {/* Delete */}
         <button
-          onClick={() =>
-    setSelectedRooms(prev => ({
-  ...prev,
-  [plan.RatePlanId]: (prev[plan.RatePlanId] || []).filter(
-    x => x.id !== item.id
-  ),
-}))
-          }
+ onClick={() => {
+  // Remove from RoomCard UI
+  setSelectedRooms(prev => ({
+    ...prev,
+    [plan.RatePlanId]: (prev[plan.RatePlanId] || []).filter(
+      x => x.id !== item.id
+    ),
+  }));
+
+  // Remove from Booking Summary
+  onRemoveRoom(
+    room.RoomTypeId,
+    plan.RatePlanId,
+    item.adults,
+    item.children,
+    true
+  );
+}}
           className="flex h-10 w-10 items-center justify-center rounded-full border border-red-300 text-red-500"
         >
           🗑
