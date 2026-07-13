@@ -59,11 +59,8 @@ const [selectedRooms, setSelectedRooms] = useState<
   Record<string, SelectedRoomData[]>
 >({});
 
-const [adultCount, setAdultCount] = useState(
-  room.MaxOccupancy.DefaultAdult
-);
-
-const [childCount, setChildCount] = useState(0);
+const adultCount = room.MaxOccupancy.DefaultAdult;
+const childCount = 0;
   const nextImage = () => {
     setCurrentImage((prev) =>
       prev === room.RoomImages.length - 1 ? 0 : prev + 1
@@ -395,7 +392,7 @@ onBookRoom(
     : "Book Room"}
 </button>
                     </div>
-{planRooms.map((item, index) => (
+{planRooms.map((item) => (
   <div
     key={item.id}
     className="mt-4 border-t pt-4"
