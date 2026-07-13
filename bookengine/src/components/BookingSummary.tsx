@@ -3,6 +3,8 @@ import type { PriceDetail, RatePlan } from "./RoomList";
 import { useState } from "react";
 
 export interface SelectedRoom {
+    RoomId: string;
+    
   RoomTypeId: string;
   RoomTypeName: string;
   RoomTypeDescription: string;
@@ -20,16 +22,26 @@ export interface SelectedRoom {
 
 interface Props {
   rooms: SelectedRoom[];
-onRemoveRoom: (
-  roomTypeId: string,
-  ratePlanId: string,
-  adults: number,
-  children: number,
-  removeAll: boolean
-) => void;
+
+  onRemoveRoom?: (
+    roomTypeId: string,
+    ratePlanId: string,
+    adults: number,
+    children: number,
+    removeAll: boolean
+  ) => void;
+
+  readOnly?: boolean;
+
+  onContinue?: () => void;
 }
 
-const BookingSummary = ({ rooms, onRemoveRoom }: Props) => {
+const BookingSummary = ({
+  rooms,
+  onRemoveRoom,
+  readOnly = false,
+  onContinue
+}: Props) => {
   const [removeRoom, setRemoveRoom] = useState<SelectedRoom | null>(null);
   const getRoomTotal = (room: SelectedRoom) => {
   let total = 0;
@@ -172,25 +184,27 @@ const totalAmount = rooms.reduce(
  ₹{getRoomTotal(room).toLocaleString()}
 </p>
 
-<button
-  onClick={() => {
-    if (room.Quantity > 1) {
-      setRemoveRoom(room);
-    } else {
-      onRemoveRoom(
-        room.RoomTypeId,
-        room.RatePlan.RatePlanId,
-        room.AdultCount,
-        room.ChildCount,
-        true
-      );
-    }
-  }}
-  className="mt-3 flex items-center gap-1 text-sm text-red-600 hover:text-red-700"
->
-  <Trash2 size={16} />
-  Remove
-</button>
+{!readOnly && onRemoveRoom && (
+  <button
+    onClick={() => {
+      if (room.Quantity > 1) {
+        setRemoveRoom(room);
+      } else {
+        onRemoveRoom(
+          room.RoomTypeId,
+          room.RatePlan.RatePlanId,
+          room.AdultCount,
+          room.ChildCount,
+          true
+        );
+      }
+    }}
+    className="mt-3 flex items-center gap-1 text-sm text-red-600 hover:text-red-700"
+  >
+    <Trash2 size={16} />
+    Remove
+  </button>
+)}
 
                   </div>
 
@@ -219,14 +233,18 @@ const totalAmount = rooms.reduce(
               </span>
             </div>
 
-            <button className="w-full rounded-lg bg-[#173f8a] py-3 font-semibold text-white hover:bg-[#102f6c]">
-              Continue Booking
-            </button>
-
+{!readOnly && (
+  <button
+  onClick={() => onContinue?.()}
+    className="w-full rounded-lg bg-[#173f8a] py-3 font-semibold text-white hover:bg-[#102f6c]"
+  >
+    Continue Booking
+  </button>
+)}
           </div>
         </>
       )}
-      {removeRoom && (
+  {!readOnly && removeRoom && (
   <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
     <div className="w-full max-w-sm rounded-xl bg-white p-6 shadow-xl">
 
@@ -249,34 +267,34 @@ const totalAmount = rooms.reduce(
       <div className="space-y-3">
 
         <button
-          onClick={() => {
-            onRemoveRoom(
-              removeRoom.RoomTypeId,
-              removeRoom.RatePlan.RatePlanId,
-              removeRoom.AdultCount,
-              removeRoom.ChildCount,
-              false
-            );
+         onClick={() => {
+  onRemoveRoom?.(
+    removeRoom.RoomTypeId,
+    removeRoom.RatePlan.RatePlanId,
+    removeRoom.AdultCount,
+    removeRoom.ChildCount,
+    false
+  );
 
-            setRemoveRoom(null);
-          }}
+  setRemoveRoom(null);
+}}
           className="w-full rounded-lg border border-[#173f8a] py-2 font-medium text-[#173f8a] hover:bg-[#173f8a] hover:text-white"
         >
           Remove 1 Room
         </button>
 
         <button
-          onClick={() => {
-            onRemoveRoom(
-              removeRoom.RoomTypeId,
-              removeRoom.RatePlan.RatePlanId,
-              removeRoom.AdultCount,
-              removeRoom.ChildCount,
-              true
-            );
+       onClick={() => {
+  onRemoveRoom?.(
+    removeRoom.RoomTypeId,
+    removeRoom.RatePlan.RatePlanId,
+    removeRoom.AdultCount,
+    removeRoom.ChildCount,
+    true
+  );
 
-            setRemoveRoom(null);
-          }}
+  setRemoveRoom(null);
+}}
           className="w-full rounded-lg bg-red-600 py-2 font-medium text-white hover:bg-red-700"
         >
           Remove All Rooms

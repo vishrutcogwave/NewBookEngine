@@ -9,6 +9,7 @@ import type { PriceDetail, RatePlan, RoomType } from "../components/RoomList";
 import RoomList from "../components/RoomList";
 import BookingSummary, { type SelectedRoom } from "../components/BookingSummary";
 import Footer from "../components/Footer";
+import { useNavigate } from "react-router-dom";
 
 interface HotelResponse {
   Hotel: {
@@ -17,16 +18,28 @@ interface HotelResponse {
     HotelDetail: string;
     Amenities: string[];
     Images: string[];
+
     HotelContact: {
       MobileNo: string;
       EmailId: string;
     };
+
+    Policies: {
+      Cancellation: string;
+      CheckinTime: string;
+      CheckoutTime: string;
+    };
   };
 
   RoomTypes: RoomType[];
+
+  BookingPolicy: {
+    PolicyPoints: string[];
+  };
 }
 
 const LandingPage = () => {
+  const navigate = useNavigate();
   const [hotelData, setHotelData] = useState<HotelResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -97,49 +110,50 @@ const handleBookRoom = (
   ratePlan: RatePlan,
   price: PriceDetail,
   adults: number,
-  children: number
+  children: number,
+  roomId?: string
 ) => {
-  setSelectedRooms((prev) => {
-    const existing = prev.find(
-      (x) =>
-        x.RoomTypeId === room.RoomTypeId &&
-        x.RatePlan.RatePlanId === ratePlan.RatePlanId &&
-        x.AdultCount === adults &&
-        x.ChildCount === children
-    );
+  setSelectedRooms(prev => {
 
-    if (existing) {
-      return prev.map((item) =>
-        item.RoomTypeId === room.RoomTypeId &&
-        item.RatePlan.RatePlanId === ratePlan.RatePlanId &&
-        item.AdultCount === adults &&
-        item.ChildCount === children
-          ? {
-              ...item,
-              Quantity: item.Quantity + 1,
-            }
-          : item
-      );
-    }
+ const existingIndex = prev.findIndex(
+  item => item.RoomId === roomId
+);
 
-    return [
-      ...prev,
-      {
-        RoomTypeId: room.RoomTypeId,
-        RoomTypeName: room.RoomTypeName,
-        RoomTypeDescription: room.RoomTypeDescription,
-        RoomImages: room.RoomImages,
-        Amenities: room.Amenities,
+if (roomId && existingIndex !== -1) {
+  return prev.map(item =>
+    item.RoomId === roomId
+      ? {
+          ...item,
+          AdultCount: adults,
+          ChildCount: children,
+          Price: price,
+          RatePlan: {
+            ...item.RatePlan,
+            PricePerNight: price.OfferPricePerNight,
+          },
+        }
+      : item
+  );
+}
+return [
+  ...prev,
+  {
+    RoomId: roomId!, // use the RoomId from RoomCard
+    RoomTypeId: room.RoomTypeId,
+    RoomTypeName: room.RoomTypeName,
+    RoomTypeDescription: room.RoomTypeDescription,
+    RoomImages: room.RoomImages,
+    Amenities: room.Amenities,
 
-        Quantity: 1,
+    Quantity: 1,
 
-        AdultCount: adults,
-        ChildCount: children,
+    AdultCount: adults,
+    ChildCount: children,
 
-        RatePlan: ratePlan,
-        Price: price,
-      },
-    ];
+    RatePlan: ratePlan,
+    Price: price,
+  },
+];
   });
 };
 const handleRemoveRoom = (
@@ -178,6 +192,29 @@ const handleRemoveRoom = (
       return [];
     })
   );
+};
+const handleContinueBooking = () => {
+  if (!hotelData) return;
+
+  if (selectedRooms.length === 0) {
+    alert("Please select at least one room.");
+    return;
+  }
+
+  navigate("/payment", {
+    state: {
+      hotelName: hotelData.Hotel.Name,
+      supportNumber: hotelData.Hotel.HotelContact.MobileNo,
+
+      rooms: selectedRooms,
+
+      cancellation: hotelData.Hotel.Policies.Cancellation,
+      checkIn: hotelData.Hotel.Policies.CheckinTime,
+      checkOut: hotelData.Hotel.Policies.CheckoutTime,
+
+      policyPoints: hotelData.BookingPolicy.PolicyPoints,
+    },
+  });
 };
   if (loading) {
     return (
@@ -256,10 +293,11 @@ const handleRemoveRoom = (
     {/* Booking Summary */}
 
     <div className="w-full xl:w-[420px]">
-      <BookingSummary
-        rooms={selectedRooms}
-        onRemoveRoom={handleRemoveRoom}
-      />
+<BookingSummary
+  rooms={selectedRooms}
+  onRemoveRoom={handleRemoveRoom}
+  onContinue={handleContinueBooking}
+/>
     </div>
 
   </div>
