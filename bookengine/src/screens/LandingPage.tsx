@@ -48,6 +48,10 @@ const getToday = () => {
   return new Date().toISOString().split("T")[0]; // yyyy-MM-dd
 };
 
+
+useEffect(() => {
+  localStorage.setItem("selectedRooms", JSON.stringify(selectedRooms));
+}, [selectedRooms]);
 const getTomorrow = () => {
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
@@ -57,7 +61,10 @@ const getTomorrow = () => {
 const [checkInDate, setCheckInDate] = useState(getToday);
 const [checkOutDate, setCheckOutDate] = useState(getTomorrow);
   const [numNights, setNumNights] = useState(1);
-
+useEffect(() => {
+  localStorage.setItem("checkInDate", checkInDate);
+  localStorage.setItem("checkOutDate", checkOutDate);
+}, [checkInDate, checkOutDate]);
   const formatDate = (date: string) => {
     const [year, month, day] = date.split("-");
     return `${month}/${day}/${year}`;

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, Navigate } from "react-router-dom";
 import Header from "./Header";
 import BookingSummary, { type SelectedRoom } from "./BookingSummary";
@@ -37,6 +37,9 @@ const PaymentPage = () => {
     mobile: "",
   });
 
+  useEffect(() => {
+  localStorage.setItem("guest", JSON.stringify(guest));
+}, [guest]);
   const [errors, setErrors] = useState({
     fullName: "",
     email: "",
@@ -92,6 +95,8 @@ const PaymentPage = () => {
     }
 
     try {
+      localStorage.removeItem("reservationSubmitted");
+sessionStorage.removeItem("merchantOrderId");
       const response = await createPhonePePayment({
         Amount: Math.round(finalAmount * 100),
         RedirectURL: `${window.location.origin}/#/payment-success`,

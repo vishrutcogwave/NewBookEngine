@@ -192,3 +192,32 @@ export const getOtherCharges = async ({
 
   return data;
 };
+
+
+export interface SubmitReservationParams {
+  propertyid: string;
+  HotelID: string;
+  Branchcode: string;
+  payload: any;
+}
+
+export const submitReservationData = async ({
+  propertyid,
+  HotelID,
+  Branchcode,
+  payload,
+}: SubmitReservationParams) => {
+  const { data } = await api.post(
+    ENDPOINTS.SUBMIT_RESERVATION_DATA,
+    payload,
+    {
+      params: {
+        propertyid,
+        HotelID,
+        Branchcode,
+      },
+    }
+  );
+
+  return data;
+};

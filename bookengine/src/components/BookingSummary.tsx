@@ -63,7 +63,14 @@ useEffect(() => {
         Branchcode: "HMS_1001",
       });
 
-      setOtherCharges(response ?? []);
+     const charges = response ?? [];
+
+setOtherCharges(charges);
+
+localStorage.setItem(
+  "otherCharges",
+  JSON.stringify(charges)
+);
     } catch (err) {
       console.error(err);
     }
@@ -136,6 +143,10 @@ useEffect(() => {
         }
 
         setRoomTaxes(taxes);
+        localStorage.setItem(
+  "roomTaxes",
+  JSON.stringify(taxes)
+);
       };
 
       fetchTaxes();
@@ -149,6 +160,12 @@ const otherChargesAmount = otherCharges.reduce((sum, charge) => {
   return sum + amount;
 }, 0);
   const finalAmount = totalAmount + taxAmount + otherChargesAmount;
+  useEffect(() => {
+  localStorage.setItem(
+    "finalAmount",
+    JSON.stringify(finalAmount)
+  );
+}, [finalAmount]);
   useEffect(() => {
   onFinalAmountChange?.(finalAmount);
 }, [finalAmount, onFinalAmountChange]);
