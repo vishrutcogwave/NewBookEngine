@@ -7,6 +7,7 @@ const ENDPOINTS = {
    GET_TAX_AMOUNT: "/api/falcon/bookingengine/gettaxamount",
      CREATE_PHONEPE_PAYMENT: "/api/falcon/phonepepayment/PGCreatePayment",
   PHONEPE_PAYMENT_STATUS: "/api/falcon/phonepepayment/PGPaymentStatus",
+    GET_OTHER_CHARGES: "/api/falcon/bookingengine/getothercharges",
 };
 
 export default ENDPOINTS;

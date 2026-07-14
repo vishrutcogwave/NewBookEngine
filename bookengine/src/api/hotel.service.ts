@@ -170,3 +170,25 @@ export const getPhonePePaymentStatus = async ({
 
   return data;
 };
+
+export interface OtherChargesParams {
+  propertyid: string;
+  HotelID: string;
+  Branchcode: string;
+}
+
+export const getOtherCharges = async ({
+  propertyid,
+  HotelID,
+  Branchcode,
+}: OtherChargesParams) => {
+  const { data } = await api.get(ENDPOINTS.GET_OTHER_CHARGES, {
+    params: {
+      propertyid,
+      HotelID,
+      Branchcode,
+    },
+  });
+
+  return data;
+};

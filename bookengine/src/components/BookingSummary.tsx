@@ -1,6 +1,6 @@
   import type { PriceDetail, RatePlan } from "./RoomList";
   import { useEffect, useState } from "react";
-  import { getTaxAmount } from "../api/hotel.service";
+  import { getOtherCharges, getTaxAmount } from "../api/hotel.service";
 
   export interface SelectedRoom {
     RoomId: string;
@@ -22,7 +22,7 @@
 
   interface Props {
     rooms: SelectedRoom[];
-
+  onFinalAmountChange?: (amount: number) => void;
     onRemoveRoom?: (
       roomTypeId: string,
       ratePlanId: string,
@@ -40,6 +40,7 @@
     rooms,
     readOnly = false,
     onContinue,
+    onFinalAmountChange
   }: Props) => {
     console.log("rooms",rooms);
     
@@ -52,7 +53,24 @@
         }
       >
     >({});
+const [otherCharges, setOtherCharges] = useState<any[]>([]);
+useEffect(() => {
+  const fetchOtherCharges = async () => {
+    try {
+      const response = await getOtherCharges({
+        propertyid: "10001",
+        HotelID: "FALC_1001",
+        Branchcode: "HMS_1001",
+      });
 
+      setOtherCharges(response ?? []);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  fetchOtherCharges();
+}, []);
     const getRoomTotal = (room: SelectedRoom) => {
       let total = 0;
 
@@ -126,8 +144,14 @@
       (sum, room) => sum + room.taxAmount,
       0,
     );
-
-    const finalAmount = totalAmount + taxAmount;
+const otherChargesAmount = otherCharges.reduce((sum, charge) => {
+  const amount = (totalAmount * Number(charge.Percentage || 0)) / 100;
+  return sum + amount;
+}, 0);
+  const finalAmount = totalAmount + taxAmount + otherChargesAmount;
+  useEffect(() => {
+  onFinalAmountChange?.(finalAmount);
+}, [finalAmount, onFinalAmountChange]);
     return (
       <div className="sticky top-5 rounded-xl border bg-white shadow-sm">
         <div className="border-b p-5">
@@ -259,6 +283,27 @@
 
               <div className="flex justify-between">
                 <span>Room Amount</span>
+                {otherCharges.map((charge) => {
+  const amount =
+    (totalAmount * Number(charge.Percentage || 0)) / 100;
+
+  return (
+    <div
+      key={charge.Rno}
+      className="flex justify-between"
+    >
+      <span>
+        {charge.ChargesParticular} ({charge.Percentage}%)
+      </span>
+
+      <span className="font-semibold">
+        ₹{amount.toLocaleString(undefined, {
+          maximumFractionDigits: 2,
+        })}
+      </span>
+    </div>
+  );
+})}
                 <span className="font-semibold">
                   ₹{totalAmount.toLocaleString()}
                 </span>
@@ -266,7 +311,13 @@
 
               <div className="border-t pt-3 flex justify-between">
                 <span className="text-lg font-bold">Final Amount</span>
-
+{otherCharges.length > 0 && (
+  <div className="rounded-lg bg-blue-50 p-3 text-xs text-blue-800">
+    <span className="font-semibold">Note:</span>{" "}
+    Final amount includes{" "}
+    {otherCharges.map((c) => c.ChargesParticular).join(", ")}.
+  </div>
+)}
                 <span className="text-2xl font-bold text-[#173f8a]">
                   ₹{finalAmount.toLocaleString()}
                 </span>

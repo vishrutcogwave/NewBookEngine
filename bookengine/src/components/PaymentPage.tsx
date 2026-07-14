@@ -1,9 +1,7 @@
 import { useState } from "react";
 import { useLocation, Navigate } from "react-router-dom";
 import Header from "./Header";
-import BookingSummary, {
-  type SelectedRoom,
-} from "./BookingSummary";
+import BookingSummary, { type SelectedRoom } from "./BookingSummary";
 import GuestDetails from "./GuestDetails";
 import HotelPolicies from "./HotelPolicies";
 import { createPhonePePayment } from "../api/hotel.service";
@@ -45,46 +43,20 @@ const PaymentPage = () => {
     mobile: "",
   });
 
+  // This will be updated by BookingSummary
+  const [finalAmount, setFinalAmount] = useState(0);
+
   const handleChange = (field: string, value: string) => {
     setGuest((prev) => ({
       ...prev,
       [field]: value,
     }));
 
-    // Clear error while typing
     setErrors((prev) => ({
       ...prev,
       [field]: "",
     }));
   };
-
-  const getRoomTotal = (room: SelectedRoom) => {
-    let total = 0;
-
-    room.RatePlan.PriceDetails.forEach((day) => {
-      const prices = day.Prices?.[0];
-      if (!prices) return;
-
-      const adult = prices[room.AdultCount.toString()];
-      const child =
-        room.ChildCount > 0
-          ? prices[room.ChildCount.toString()]
-          : null;
-
-      if (!adult) return;
-
-      total +=
-        adult.AdultPrice +
-        (child?.ChildPrice ?? 0) * room.ChildCount;
-    });
-
-    return total * room.Quantity;
-  };
-
-  const totalAmount = rooms.reduce(
-    (sum, room) => sum + getRoomTotal(room),
-    0
-  );
 
   const handlePayment = async () => {
     const newErrors = {
@@ -99,9 +71,7 @@ const PaymentPage = () => {
 
     if (!guest.email.trim()) {
       newErrors.email = "Email is required.";
-    } else if (
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(guest.email)
-    ) {
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(guest.email)) {
       newErrors.email = "Please enter a valid email address.";
     }
 
@@ -121,44 +91,40 @@ const PaymentPage = () => {
       return;
     }
 
-    console.log("Guest:", guest);
-    console.log("Rooms:", rooms);
-    console.log("Amount:", totalAmount);
-try {
-  const response = await createPhonePePayment({
-  Amount: Math.round(totalAmount * 100),
-RedirectURL: `${window.location.origin}/#/payment-success`,
-    branchcode: "HMS_1001",
-    Propertycode: "10001",
-    HotelId: "FALC_1001",
-  });
+    try {
+      const response = await createPhonePePayment({
+        Amount: Math.round(finalAmount * 100),
+        RedirectURL: `${window.location.origin}/#/payment-success`,
+        branchcode: "HMS_1001",
+        Propertycode: "10001",
+        HotelId: "FALC_1001",
+      });
 
-  console.log("PhonePe Response:", response);
- sessionStorage.setItem('merchantOrderId', response?.merchantOrderId);
-  // If API returns payment URL
-  if (response?.PaymentURL) {
-    window.location.href = response.PaymentURL;
-    return;
-  }
+      sessionStorage.setItem(
+        "merchantOrderId",
+        response?.merchantOrderId
+      );
 
-  // If API returns redirectUrl
-  if (response?.redirectUrl) {
-    window.location.href = response.redirectUrl;
-    return;
-  }
+      if (response?.PaymentURL) {
+        window.location.href = response.PaymentURL;
+        return;
+      }
 
-  // If API returns url
-  if (response?.url) {
-    window.location.href = response.url;
-    return;
-  }
+      if (response?.redirectUrl) {
+        window.location.href = response.redirectUrl;
+        return;
+      }
 
-  console.warn("Unexpected payment response:", response);
-} catch (error) {
-  console.error("Payment API Error:", error);
-  alert("Unable to initiate payment. Please try again.");
-}
-    // Call Payment API here
+      if (response?.url) {
+        window.location.href = response.url;
+        return;
+      }
+
+      console.warn(response);
+    } catch (error) {
+      console.error(error);
+      alert("Unable to initiate payment. Please try again.");
+    }
   };
 
   return (
@@ -170,9 +136,7 @@ RedirectURL: `${window.location.origin}/#/payment-success`,
 
       <div className="mx-auto max-w-7xl px-4 py-8">
         <div className="grid gap-6 xl:grid-cols-[1fr_420px]">
-
           <div className="space-y-6">
-
             <GuestDetails
               fullName={guest.fullName}
               email={guest.email}
@@ -182,18 +146,19 @@ RedirectURL: `${window.location.origin}/#/payment-success`,
             />
 
             <div className="rounded-xl border bg-white p-6 shadow-sm">
-
               <button
                 onClick={handlePayment}
                 className="w-full rounded-lg bg-[#173f8a] py-4 text-lg font-semibold text-white transition hover:bg-[#12306b]"
               >
-                Proceed To Payment ₹{totalAmount.toLocaleString()}
+                Proceed To Payment ₹
+                {finalAmount.toLocaleString("en-IN", {
+                  maximumFractionDigits: 2,
+                })}
               </button>
 
               <p className="mt-3 text-center text-sm text-gray-500">
                 🔒 Secure payment powered by our payment gateway.
               </p>
-
             </div>
 
             <HotelPolicies
@@ -202,15 +167,15 @@ RedirectURL: `${window.location.origin}/#/payment-success`,
               checkOut={checkOut}
               points={policyPoints}
             />
-
-          </div>
- <div className="w-full xl:w-[420px]">
-          <BookingSummary
-            rooms={rooms}
-            readOnly
-          />
           </div>
 
+          <div className="w-full xl:w-[420px]">
+            <BookingSummary
+              rooms={rooms}
+              readOnly
+              onFinalAmountChange={setFinalAmount}
+            />
+          </div>
         </div>
       </div>
     </div>
