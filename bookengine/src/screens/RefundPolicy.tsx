@@ -15,21 +15,25 @@ export default function RefundPolicy() {
     loadRefundPolicy();
   }, []);
 
-  const loadRefundPolicy = async () => {
-    try {
-      const res = await getHotelRefundPolicy(
-        "10001",
-        "FALC_1001",
-        "HMS_1001"
-      );
+const loadRefundPolicy = async () => {
+  try {
+    const propertyid = localStorage.getItem("propertyid") || "";
+    const HotelID = localStorage.getItem("HotelID") || "";
+    const Branchcode = localStorage.getItem("Branchcode") || "";
 
-      setRefund(res);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    const res = await getHotelRefundPolicy(
+      propertyid,
+      HotelID,
+      Branchcode
+    );
+
+    setRefund(res);
+  } catch (err) {
+    console.error(err);
+  } finally {
+    setLoading(false);
+  }
+};
 
   if (loading) {
     return (

@@ -15,21 +15,25 @@ export default function PrivacyPolicy() {
     loadPolicy();
   }, []);
 
-  const loadPolicy = async () => {
-    try {
-      const res = await getHotelPolicy(
-        "10001",
-        "FALC_1001",
-        "HMS_1001"
-      );
+const loadPolicy = async () => {
+  try {
+    const propertyid = localStorage.getItem("propertyid") || "";
+    const HotelID = localStorage.getItem("HotelID") || "";
+    const Branchcode = localStorage.getItem("Branchcode") || "";
 
-      setPolicy(res);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    const res = await getHotelPolicy(
+      propertyid,
+      HotelID,
+      Branchcode
+    );
+
+    setPolicy(res);
+  } catch (err) {
+    console.error(err);
+  } finally {
+    setLoading(false);
+  }
+};
 
   if (loading) {
     return (

@@ -43,6 +43,9 @@
     onFinalAmountChange
   }: Props) => {
     console.log("rooms",rooms);
+    const propertyid = localStorage.getItem("propertyid") || "";
+const HotelID = localStorage.getItem("HotelID") || "";
+const Branchcode = localStorage.getItem("Branchcode") || "";
     
     const [roomTaxes, setRoomTaxes] = useState<
       Record<
@@ -57,12 +60,11 @@ const [otherCharges, setOtherCharges] = useState<any[]>([]);
 useEffect(() => {
   const fetchOtherCharges = async () => {
     try {
-      const response = await getOtherCharges({
-        propertyid: "10001",
-        HotelID: "FALC_1001",
-        Branchcode: "HMS_1001",
-      });
-
+const response = await getOtherCharges({
+  propertyid,
+  HotelID,
+  Branchcode,
+});
      const charges = response ?? [];
 
 setOtherCharges(charges);
@@ -119,12 +121,12 @@ localStorage.setItem(
           const roomTotal = getRoomTotal(room);
 
           try {
-            const response = await getTaxAmount({
-              propertyid: "10001",
-              HotelID: "FALC_1001",
-              Branchcode: "HMS_1001",
-              amount: roomTotal,
-            });
+       const response = await getTaxAmount({
+  propertyid,
+  HotelID,
+  Branchcode,
+  amount: roomTotal,
+});
 
             const totalTax = response.reduce(
               (sum: number, item: any) => sum + Number(item.TaxVaue),

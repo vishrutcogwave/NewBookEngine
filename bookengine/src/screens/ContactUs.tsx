@@ -21,22 +21,25 @@ export default function ContactUs() {
     loadContact();
   }, []);
 
-  const loadContact = async () => {
-    try {
-      const res = await getHotelContact(
-        "10001",
-        "FALC_1001",
-        "HMS_1001"
-      );
+ const loadContact = async () => {
+  try {
+    const propertyid = localStorage.getItem("propertyid") || "";
+    const HotelID = localStorage.getItem("HotelID") || "";
+    const Branchcode = localStorage.getItem("Branchcode") || "";
 
-      setContact(res);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    const res = await getHotelContact(
+      propertyid,
+      HotelID,
+      Branchcode
+    );
 
+    setContact(res);
+  } catch (err) {
+    console.error(err);
+  } finally {
+    setLoading(false);
+  }
+};
   if (loading) {
     return (
       <div className="flex h-screen items-center justify-center">

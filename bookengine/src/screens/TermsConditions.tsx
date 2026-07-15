@@ -15,22 +15,25 @@ export default function TermsConditions() {
     loadTerms();
   }, []);
 
-  const loadTerms = async () => {
-    try {
-      const res = await getHotelTerms(
-        "10001",
-        "FALC_1001",
-        "HMS_1001"
-      );
+const loadTerms = async () => {
+  try {
+    const propertyid = localStorage.getItem("propertyid") || "";
+    const HotelID = localStorage.getItem("HotelID") || "";
+    const Branchcode = localStorage.getItem("Branchcode") || "";
 
-      setTerms(res);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    const res = await getHotelTerms(
+      propertyid,
+      HotelID,
+      Branchcode
+    );
 
+    setTerms(res);
+  } catch (err) {
+    console.error(err);
+  } finally {
+    setLoading(false);
+  }
+};
   if (loading) {
     return (
       <div className="flex h-screen items-center justify-center">

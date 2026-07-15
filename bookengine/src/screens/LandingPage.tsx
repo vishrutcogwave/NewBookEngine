@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getHotelData } from "../api/hotel.service";
+
 import Header from "../components/Header";
 import HotelInfo from "../components/HotelInfo";
 import ImageGallery from "../components/ImageGallery";
@@ -9,7 +10,7 @@ import type { PriceDetail, RatePlan, RoomType } from "../components/RoomList";
 import RoomList from "../components/RoomList";
 import BookingSummary, { type SelectedRoom } from "../components/BookingSummary";
 import Footer from "../components/Footer";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 interface HotelResponse {
   Hotel: {
@@ -40,6 +41,13 @@ interface HotelResponse {
 
 const LandingPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+
+const [hotelConfig, setHotelConfig] = useState({
+  propertyid: "",
+  HotelID: "",
+  Branchcode: "",
+});
   const [hotelData, setHotelData] = useState<HotelResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -52,6 +60,32 @@ const getToday = () => {
 useEffect(() => {
   localStorage.setItem("selectedRooms", JSON.stringify(selectedRooms));
 }, [selectedRooms]);
+useEffect(() => {
+  const hash = window.location.hash;
+
+  let propertyid = "";
+  let HotelID = "";
+  let Branchcode = "";
+
+  if (hash.includes("?")) {
+    const query = hash.substring(hash.indexOf("?"));
+    const params = new URLSearchParams(query);
+
+    propertyid = params.get("propertyid") || "";
+    HotelID = params.get("HotelID") || "";
+    Branchcode = params.get("Branchcode") || "";
+
+    if (propertyid) localStorage.setItem("propertyid", propertyid);
+    if (HotelID) localStorage.setItem("HotelID", HotelID);
+    if (Branchcode) localStorage.setItem("Branchcode", Branchcode);
+  }
+
+  setHotelConfig({
+    propertyid: propertyid || localStorage.getItem("propertyid") || "",
+    HotelID: HotelID || localStorage.getItem("HotelID") || "",
+    Branchcode: Branchcode || localStorage.getItem("Branchcode") || "",
+  });
+}, [location]);
 const getTomorrow = () => {
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
@@ -70,44 +104,52 @@ useEffect(() => {
     return `${month}/${day}/${year}`;
   };
 
-  const fetchHotelData = async (
-    checkIn: string = checkInDate,
-    checkOut: string = checkOutDate
-  ) => {
-    try {
-      setLoading(true);
-      setError("");
+const fetchHotelData = async (
+  checkIn: string = checkInDate,
+  checkOut: string = checkOutDate
+) => {
+  try {
+    setLoading(true);
+    setError("");
 
-      const response = await getHotelData({
-        propertyid: "10001",
-        HotelID: "FALC_1001",
-        Branchcode: "HMS_1001",
-        checkindate: formatDate(checkIn),
-        checkoutdate: formatDate(checkOut),
-      });
-console.log("response",response);
+    const response = await getHotelData({
+      propertyid: hotelConfig.propertyid,
+      HotelID: hotelConfig.HotelID,
+      Branchcode: hotelConfig.Branchcode,
+      checkindate: formatDate(checkIn),
+      checkoutdate: formatDate(checkOut),
+    });
 
-      setHotelData(response);
-    } catch (err) {
-      console.error(err);
-      setError("Unable to load hotel information.");
-    } finally {
-      setLoading(false);
-    }
-  };
+    console.log("response", response);
 
-  useEffect(() => {
-    const checkIn = new Date(checkInDate);
-    const checkOut = new Date(checkOutDate);
+    setHotelData(response);
+  } catch (err) {
+    console.error(err);
+    setError("Unable to load hotel information.");
+  } finally {
+    setLoading(false);
+  }
+};
+useEffect(() => {
+  if (
+    !hotelConfig.propertyid ||
+    !hotelConfig.HotelID ||
+    !hotelConfig.Branchcode
+  ) {
+    return;
+  }
 
-    const diff =
-      (checkOut.getTime() - checkIn.getTime()) /
-      (1000 * 60 * 60 * 24);
+  const checkIn = new Date(checkInDate);
+  const checkOut = new Date(checkOutDate);
 
-    setNumNights(diff > 0 ? diff : 0);
+  const diff =
+    (checkOut.getTime() - checkIn.getTime()) /
+    (1000 * 60 * 60 * 24);
 
-    fetchHotelData(checkInDate, checkOutDate);
-  }, [checkInDate, checkOutDate]);
+  setNumNights(diff > 0 ? diff : 0);
+
+  fetchHotelData(checkInDate, checkOutDate);
+}, [checkInDate, checkOutDate, hotelConfig]);
 
   const handleSearch = () => {
     fetchHotelData(checkInDate, checkOutDate);
