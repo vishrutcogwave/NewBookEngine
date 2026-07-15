@@ -37,7 +37,7 @@ const RoomCard = ({
   onRemoveRoom
 }: Props) => {
   const [currentImage, setCurrentImage] = useState(0);
-
+const [showPreview, setShowPreview] = useState(false);
   const [selectedRatePlan, setSelectedRatePlan] = useState(
     room.RatePlans.find((x) => x.IsDefaultSelect) ??
       room.RatePlans[0]
@@ -70,20 +70,18 @@ const childCount = 0;
   };
 
   return (
-    <div className="mb-8 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+<div className="grid grid-cols-1 xl:grid-cols-[420px_1fr] gap-4 md:gap-6 xl:gap-8 items-start rounded-2xl border bg-white p-3 sm:p-5 lg:p-6">
 
-      <div className="grid grid-cols-1 lg:grid-cols-[330px_1fr]">
+  {/* LEFT IMAGE */}
+<div className="lg:sticky lg:top-6 w-full">
+  <div className="relative h-56 sm:h-72 md:h-80 lg:h-[320px] xl:h-[360px] overflow-hidden rounded-2xl">
 
-        {/* IMAGE */}
-
-   <div className="relative h-full min-h-[700px] overflow-hidden">
-
-  <img
-    src={room.RoomImages[currentImage]}
-    alt={room.RoomTypeName}
-    className="absolute inset-0 h-full w-full object-cover"
-  />
-
+      <img
+        src={room.RoomImages[currentImage]}
+        alt={room.RoomTypeName}
+        onClick={() => setShowPreview(true)}
+        className="absolute inset-0 h-full w-full object-cover transition hover:scale-105"
+      />
           {room.RoomImages.length > 1 && (
             <>
               <button
@@ -118,7 +116,7 @@ const childCount = 0;
           )}
 
      <div
-  className={`absolute left-4 top-4 rounded-md px-3 py-1 text-xs font-semibold text-white ${
+  className={`absolute  rounded-md left-3 top-3 sm:left-4 sm:top-4 px-2 sm:px-3 py-1 text-[11px] sm:text-xs font-semibold text-white ${
     room.Availability.RoomsLeft <= 2
       ? "bg-red-600"
       : room.Availability.RoomsLeft <= 5
@@ -137,17 +135,20 @@ const childCount = 0;
 
         {/* RIGHT SIDE */}
 
-        <div className="p-6">
+       
+
+      </div>
+       <div className="min-w-0">
 
           <div className="flex items-start justify-between">
 
             <div>
 
-              <h2 className="text-3xl font-bold text-gray-900">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
                 {room.RoomTypeName}
               </h2>
 
-              <div className="mt-2 flex items-center gap-2 text-sm text-gray-500">
+              <div className="mt-2 flex flex-wrap items-center gap-2 text-xs sm:text-sm text-gray-500">
 
                 <Users size={16} />
 
@@ -164,12 +165,12 @@ const childCount = 0;
 
           {/* Amenities */}
 
-          <div className="mt-6 flex flex-wrap gap-3">
+          <div className="mt-6 flex flex-wrap gap-2 sm:gap-3">
 
             {room.Amenities.map((item) => (
               <div
                 key={item}
-                className="flex items-center gap-2 rounded-full bg-gray-100 px-4 py-2 text-sm"
+                className="flex items-center gap-2 rounded-full bg-gray-100 px-2 sm:px-3 py-2 text-xs sm:text-sm whitespace-nowrap"
               >
                 {item.toLowerCase().includes("king") && (
                   <BedDouble size={16} />
@@ -191,7 +192,7 @@ const childCount = 0;
 
           {/* Description */}
 
-          <p className="mt-6 leading-7 text-gray-600">
+          <p className="mt-5 text-sm sm:text-base leading-6 sm:leading-7 text-gray-600">
             {room.RoomTypeDescription}
           </p>
 
@@ -242,13 +243,13 @@ const childPrice =
 
                   {/* HEADER */}
 
-                  <div className="flex items-start justify-between p-5">
+                  <div className="flex p-4 sm:p-5 lg:p-6">
 
-                 <div className="flex w-full items-start justify-between">
+                 <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between w-full gap-6">
 
   <div>
 
-    <h3 className="text-2xl font-semibold text-gray-900">
+    <h3 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-900 leading-tight">
       {plan.RateShortName}
     </h3>
 {remainingRooms > 0 ? (
@@ -282,13 +283,13 @@ const childPrice =
 
   </div>
 
-  <div className="text-right">
+  <div className="w-full text-left mt-4 lg:mt-0 lg:w-auto lg:text-right">
 
-<h2 className="text-5xl font-bold text-[#1F2D5A]">
+<h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#1F2D5A]">
   ₹{totalPerNight.toLocaleString()}
 </h2>
 
-    <p className="mt-1 text-xl text-gray-500">
+    <p className="mt-1 whitespace-nowrap text-sm sm:text-base text-gray-500">
       / Night
     </p>
 <p className="mt-1 text-sm text-gray-500">
@@ -315,7 +316,7 @@ const childPrice =
 
                   {/* PART 2 STARTS HERE */}
 
-                                    <div className="border-t bg-gray-50 p-5">
+                                    <div className="border-t bg-gray-50 p-4 sm:p-5">
 
                     <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
 
@@ -371,7 +372,7 @@ onBookRoom(
 );
   }}
   disabled={remainingRooms <= 0 || planRooms.length > 0}
-  className={`rounded-lg px-8 py-3 font-semibold transition ${
+  className={`w-full sm:w-auto rounded-lg px-6 py-3 font-semibold transition ${
     remainingRooms <= 0
       ? "cursor-not-allowed bg-gray-400 text-white"
       : planRooms.length > 0
@@ -391,16 +392,16 @@ onBookRoom(
     key={item.id}
     className="mt-4 border-t pt-4"
   >
-    <div className="flex items-center justify-between">
+    <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
 
       <span className="font-semibold text-gray-700">
         Room
       </span>
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 sm:gap-3">
 
         {/* Adults */}
-        <div className="flex items-center rounded-full border border-gray-300 bg-white px-3 py-2">
+        <div className="flex items-center rounded-full border border-gray-300 bg-white px-2 sm:px-3 py-2">
 
           <button
           onClick={() => {
@@ -446,7 +447,7 @@ onBookRoom(
             -
           </button>
 
-          <span className="px-3 font-medium">
+          <span className="px-2 text-sm sm:text-base font-medium whitespace-nowrap">
             {item.adults} Adults
           </span>
 
@@ -500,7 +501,7 @@ onBookRoom(
         </div>
 
         {/* Children */}
-        <div className="flex items-center rounded-full border border-gray-300 bg-white px-3 py-2">
+        <div className="flex items-center rounded-full border border-gray-300 bg-white px-2 sm:px-3 py-2">
 
           <button
   onClick={() => {
@@ -546,7 +547,7 @@ onBookRoom(
             -
           </button>
 
-          <span className="px-3 font-medium">
+          <span className="px-2 text-sm sm:text-base font-medium whitespace-nowrap">
             {item.children} Child
           </span>
 
@@ -610,7 +611,7 @@ onBookRoom(
   // Remove from Booking Summary
 onRemoveRoom(item.id);
 }}
-          className="flex h-10 w-10 items-center justify-center rounded-full border border-red-300 text-red-500"
+          className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full border border-red-300 text-red-500"
         >
           🗑
         </button>
@@ -651,7 +652,7 @@ onRemoveRoom(item.id);
     newRoom.id
   );
 }}
-          className="flex h-10 w-10 items-center justify-center rounded bg-[#163A84] text-white"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#163A84] text-xl font-bold text-white"
         >
           +
         </button>
@@ -660,7 +661,7 @@ onRemoveRoom(item.id);
 
     </div>
 
-    <div className="mt-2 text-right font-semibold text-gray-900">
+    <div className="mt-3 text-left lg:text-right font-semibold text-gray-900">
     ₹{(
   (paxPrices[item.adults.toString()]?.AdultPrice ?? 0) +
   (paxPrices[item.children.toString()]?.ChildPrice ?? 0) *
@@ -681,11 +682,87 @@ onRemoveRoom(item.id);
           </div>
 
         </div>
+{showPreview && (
+  <div
+    className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/95"
+    onClick={() => setShowPreview(false)}
+  >
+    {/* Close */}
+    <button
+      onClick={(e) => {
+        e.stopPropagation();
+        setShowPreview(false);
+      }}
+      className="absolute right-6 top-6 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-white/20 text-3xl text-white backdrop-blur transition hover:bg-white/40"
+    >
+      ✕
+    </button>
 
-      </div>
+    {/* Previous */}
+    {room.RoomImages.length > 1 && (
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          previousImage();
+        }}
+        className="absolute left-6 top-1/2 z-50 flex h-14 w-14 -translate-y-1/2 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur transition hover:bg-white/40"
+      >
+        <ChevronLeft size={32} />
+      </button>
+    )}
 
+    {/* Next */}
+    {room.RoomImages.length > 1 && (
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          nextImage();
+        }}
+        className="absolute right-6 top-1/2 z-50 flex h-14 w-14 -translate-y-1/2 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur transition hover:bg-white/40"
+      >
+        <ChevronRight size={32} />
+      </button>
+    )}
+
+    {/* Main Image */}
+    <img
+      src={room.RoomImages[currentImage]}
+      alt={room.RoomTypeName}
+      onClick={(e) => e.stopPropagation()}
+      className="max-h-[88vh] max-w-[92vw] rounded-xl object-contain shadow-2xl"
+    />
+
+    {/* Counter */}
+    <div className="absolute bottom-32 left-1/2 -translate-x-1/2 rounded-full bg-black/60 px-5 py-2 text-sm text-white">
+      {currentImage + 1} / {room.RoomImages.length}
+    </div>
+
+    {/* Thumbnails */}
+    <div
+      className="absolute bottom-6 left-1/2 flex -translate-x-1/2 gap-3 overflow-x-auto rounded-xl bg-black/50 p-3 backdrop-blur"
+      onClick={(e) => e.stopPropagation()}
+    >
+      {room.RoomImages.map((img, index) => (
+        <img
+          key={index}
+          src={img}
+          alt=""
+          onClick={() => setCurrentImage(index)}
+          className={`h-20 w-28 cursor-pointer rounded-lg object-cover border-2 transition ${
+            currentImage === index
+              ? "border-white"
+              : "border-transparent opacity-70 hover:opacity-100"
+          }`}
+        />
+      ))}
+    </div>
+  </div>
+)}
     </div>
   );
 };
+
+
+
 
 export default RoomCard;

@@ -79,41 +79,53 @@ const RoomList = ({
 }: RoomListProps) => {
   if (!rooms || rooms.length === 0) {
     return (
-      <div className="rounded-xl border bg-white p-10 text-center">
-        <h3 className="text-lg font-semibold">
+      <div className="rounded-xl border bg-white p-6 sm:p-8 lg:p-10 text-center">
+        <h3 className="text-lg sm:text-xl font-semibold">
           No Rooms Available
         </h3>
 
-        <p className="mt-2 text-gray-500">
+        <p className="mt-2 text-sm sm:text-base text-gray-500">
           Please change your dates and try again.
         </p>
       </div>
     );
   }
 
-  return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-bold">
-        {rooms.length} Room Types Available
+ return (
+  <div className="space-y-4 sm:space-y-6">
+    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+      <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">
+        {rooms.length} Room Type{rooms.length > 1 ? "s" : ""} Available
       </h2>
 
-    {rooms.map((room) => {
-  const bookedRooms = selectedRooms
-    .filter((x) => x.RoomTypeId === room.RoomTypeId)
-    .reduce((sum, x) => sum + x.Quantity, 0);
-
-  return (
-  <RoomCard
-  key={room.RoomTypeId}
-  room={room}
-  bookedRooms={bookedRooms}
-  onBookRoom={onBookRoom}
-  onRemoveRoom={onRemoveRoom}
-/>
-  );
-})}
+      <span className="text-sm text-gray-500">
+        {selectedRooms.reduce((sum, room) => sum + room.Quantity, 0)} Room
+        {selectedRooms.reduce((sum, room) => sum + room.Quantity, 0) !== 1
+          ? "s"
+          : ""}{" "}
+        Selected
+      </span>
     </div>
-  );
+
+    <div className="space-y-4 sm:space-y-6">
+      {rooms.map((room) => {
+        const bookedRooms = selectedRooms
+          .filter((x) => x.RoomTypeId === room.RoomTypeId)
+          .reduce((sum, x) => sum + x.Quantity, 0);
+
+        return (
+          <RoomCard
+            key={room.RoomTypeId}
+            room={room}
+            bookedRooms={bookedRooms}
+            onBookRoom={onBookRoom}
+            onRemoveRoom={onRemoveRoom}
+          />
+        );
+      })}
+    </div>
+  </div>
+);
 };
 
 export default RoomList;
