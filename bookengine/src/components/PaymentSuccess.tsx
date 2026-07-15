@@ -141,7 +141,7 @@ const PaymentSuccess = () => {
                           roomTax / room.RatePlan.PriceDetails.length;
 
                         return {
-                          staydate: day.ProcessDate,
+                       staydate: day.ProcessDate?.split("T")[0],
 
                           room_rate: room.Price?.OfferPricePerNight,
 
