@@ -171,191 +171,192 @@ const otherChargesAmount = otherCharges.reduce((sum, charge) => {
   useEffect(() => {
   onFinalAmountChange?.(finalAmount);
 }, [finalAmount, onFinalAmountChange]);
-    return (
-      <div className="sticky top-5 rounded-xl border bg-white shadow-sm">
-        <div className="border-b p-5">
-          <h2 className="text-xl font-bold">Booking Summary</h2>
+ return (
+  <div className="sticky top-4 rounded-xl border bg-white shadow-sm">
+    <div className="border-b p-4">
+      <h2 className="text-lg font-bold">Booking Summary</h2>
 
-          <p className="mt-1 text-sm text-gray-500">
-            {totalRooms} Room{totalRooms !== 1 ? "s" : ""} Selected
-          </p>
-        </div>
+      <p className="mt-1 text-xs text-gray-500">
+        {totalRooms} Room{totalRooms !== 1 ? "s" : ""} Selected
+      </p>
+    </div>
 
-        {rooms.length === 0 ? (
-          <div className="p-10 text-center">
-            <p className="text-gray-500">No rooms selected</p>
-          </div>
-        ) : (
-          <>
-            <div className="max-h-[520px] overflow-y-auto">
-              {rooms.map((room) => (
-                <div
-                  key={`${room.RoomTypeId}-${room.RatePlan.RatePlanId}-${room.AdultCount}-${room.ChildCount}`}
-                  className="border-b p-4"
-                >
-                  <img
-                    src={room.RoomImages[0]}
-                    className="h-32 w-full rounded-lg object-cover"
-                    alt={room.RoomTypeName}
-                  />
+    {rooms.length === 0 ? (
+      <div className="p-8 text-center">
+        <p className="text-sm text-gray-500">
+          No rooms selected
+        </p>
+      </div>
+    ) : (
+      <>
+        <div className="max-h-[520px] overflow-y-auto">
+          {rooms.map((room) => (
+            <div
+              key={`${room.RoomTypeId}-${room.RatePlan.RatePlanId}-${room.AdultCount}-${room.ChildCount}`}
+              className="border-b p-3"
+            >
+              <img
+                src={room.RoomImages[0]}
+                className="h-28 w-full rounded-lg object-cover"
+                alt={room.RoomTypeName}
+              />
 
-                  <h3 className="mt-3 text-lg font-semibold">
-                    {room.RoomTypeName}
-                  </h3>
+              <h3 className="mt-2 text-base font-semibold">
+                {room.RoomTypeName}
+              </h3>
 
-                  <p className="text-sm text-gray-500">
-                    {room.RatePlan.RateShortName}
+              <p className="text-xs text-gray-500">
+                {room.RatePlan.RateShortName}
+              </p>
+
+              <div className="mt-2 flex flex-wrap gap-2">
+                {room.Amenities.slice(0, 3).map((item) => (
+                  <span
+                    key={item}
+                    className="rounded-full bg-gray-100 px-2 py-0.5 text-[10px]"
+                  >
+                    {item}
+                  </span>
+                ))}
+              </div>
+
+              <div className="mt-3 flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-xs text-gray-600">
+                    Adults :
+                    <span className="font-medium">
+                      {" "}
+                      {room.AdultCount}
+                    </span>
                   </p>
 
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {room.Amenities.slice(0, 3).map((item) => (
-                      <span
-                        key={item}
-                        className="rounded-full bg-gray-100 px-2 py-1 text-xs"
-                      >
-                        {item}
-                      </span>
-                    ))}
-                  </div>
+                  <p className="text-xs text-gray-600">
+                    Children :
+                    <span className="font-medium">
+                      {" "}
+                      {room.ChildCount}
+                    </span>
+                  </p>
 
-                  <div className="mt-3 flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-gray-600">
-                        Adults :
-                        <span className="font-medium"> {room.AdultCount}</span>
-                      </p>
+                  <p className="text-xs text-gray-600">
+                    Quantity :
+                    <span className="font-medium">
+                      {" "}
+                      {room.Quantity}
+                    </span>
+                  </p>
 
-                      <p className="text-sm text-gray-600">
-                        Children :
-                        <span className="font-medium"> {room.ChildCount}</span>
-                      </p>
+                  <p className="text-[10px] text-gray-400">
+                    Adults : ₹
+                    {room.Price.OfferPricePerNight.toLocaleString()}
+                  </p>
 
-                      <p className="text-sm text-gray-600">
-                        Quantity :
-                        <span className="font-medium"> {room.Quantity}</span>
-                      </p>
+                  {room.ChildCount > 0 && (
+                    <p className="text-[10px] text-gray-400">
+                      Children : ₹
+                      {(
+                        room.Price.ChildRatePerNight *
+                        room.ChildCount
+                      ).toLocaleString()}
+                    </p>
+                  )}
 
-                      <p className="text-xs text-gray-400">
-                        Adults : ₹{room.Price.OfferPricePerNight.toLocaleString()}
-                      </p>
+                  <p className="text-[10px] text-gray-400">
+                    {room.RatePlan.PriceDetails.length} Night
+                    {room.RatePlan.PriceDetails.length > 1
+                      ? "s"
+                      : ""}
+                  </p>
 
-                      {room.ChildCount > 0 && (
-                        <p className="text-xs text-gray-400">
-                          Children : ₹
+                  <p className="text-[10px] text-gray-400">
+                    Qty : {room.Quantity}
+                  </p>
+                </div>
+
+                <div className="text-right">
+                  {(() => {
+                    const key = `${room.RoomTypeId}-${room.RatePlan.RatePlanId}-${room.AdultCount}-${room.ChildCount}`;
+                    const roomTax = roomTaxes[key];
+
+                    return (
+                      <>
+                        <p className="text-lg font-bold text-[#173f8a]">
+                          ₹{getRoomTotal(room).toLocaleString()}
+                        </p>
+
+                        {roomTax?.taxDetails.map((tax) => (
+                          <p
+                            key={tax.TaxName}
+                            className="text-[10px] text-gray-500"
+                          >
+                            {tax.TaxName} ({tax.TaxPer}%): ₹
+                            {tax.TaxVaue}
+                          </p>
+                        ))}
+
+                        <p className="text-xs font-semibold text-green-700">
+                          Total: ₹
                           {(
-                            room.Price.ChildRatePerNight * room.ChildCount
+                            getRoomTotal(room) +
+                            (roomTax?.taxAmount ?? 0)
                           ).toLocaleString()}
                         </p>
-                      )}
-
-                      <p className="text-xs text-gray-400">
-                        {room.RatePlan.PriceDetails.length} Night
-                        {room.RatePlan.PriceDetails.length > 1 ? "s" : ""}
-                      </p>
-
-                      <p className="text-xs text-gray-400">
-                        Qty : {room.Quantity}
-                      </p>
-                    </div>
-
-                    <div className="text-right">
-                      {(() => {
-                        const key = `${room.RoomTypeId}-${room.RatePlan.RatePlanId}-${room.AdultCount}-${room.ChildCount}`;
-                        const roomTax = roomTaxes[key];
-
-                        return (
-                          <>
-                            <p className="text-xl font-bold text-[#173f8a]">
-                              ₹{getRoomTotal(room).toLocaleString()}
-                            </p>
-
-                            {roomTax?.taxDetails.map((tax) => (
-                              <p
-                                key={tax.TaxName}
-                                className="text-xs text-gray-500"
-                              >
-                                {tax.TaxName} ({tax.TaxPer}%): ₹{tax.TaxVaue}
-                              </p>
-                            ))}
-
-                            <p className="text-sm font-semibold text-green-700">
-                              Total: ₹
-                              {(
-                                getRoomTotal(room) + (roomTax?.taxAmount ?? 0)
-                              ).toLocaleString()}
-                            </p>
-                          </>
-                        );
-                      })()}
-
-              
-                    </div>
-                  </div>
+                      </>
+                    );
+                  })()}
                 </div>
-              ))}
+              </div>
             </div>
-            <div className="space-y-3 border-t p-5">
-              <div className="flex justify-between">
-                <span>Total Rooms</span>
-                <span className="font-semibold">{totalRooms}</span>
-              </div>
+          ))}
+        </div>
 
-              <div className="flex justify-between">
-                <span>Room Amount</span>
-                {otherCharges.map((charge) => {
-  const amount =
-    (totalAmount * Number(charge.Percentage || 0)) / 100;
+        <div className="space-y-2 border-t p-4">
+          <div className="flex justify-between">
+            <span className="text-sm">Total Rooms</span>
+            <span className="text-sm font-semibold">
+              {totalRooms}
+            </span>
+          </div>
 
-  return (
-    <div
-      key={charge.Rno}
-      className="flex justify-between"
-    >
-      <span>
-        {charge.ChargesParticular} ({charge.Percentage}%)
-      </span>
+          
+       <div className="border-t pt-2">
+  <div className="flex items-center justify-between">
+    <span className="text-base font-bold">
+      Final Amount
+    </span>
 
-      <span className="font-semibold">
-        ₹{amount.toLocaleString(undefined, {
-          maximumFractionDigits: 2,
-        })}
-      </span>
-    </div>
-  );
-})}
-                <span className="font-semibold">
-                  ₹{totalAmount.toLocaleString()}
-                </span>
-              </div>
-
-              <div className="border-t pt-3 flex justify-between">
-                <span className="text-lg font-bold">Final Amount</span>
-{otherCharges.length > 0 && (
-  <div className="rounded-lg bg-blue-50 p-3 text-xs text-blue-800">
-    <span className="font-semibold">Note:</span>{" "}
-    Final amount includes{" "}
-    {otherCharges.map((c) => c.ChargesParticular).join(", ")}.
+    <span className="text-xl font-bold text-[#173f8a]">
+      ₹{finalAmount.toLocaleString()}
+    </span>
   </div>
-)}
-                <span className="text-2xl font-bold text-[#173f8a]">
-                  ₹{finalAmount.toLocaleString()}
-                </span>
-              </div>
 
-              {!readOnly && (
-                <button
-                  onClick={() => onContinue?.()}
-                  className="w-full rounded-lg bg-[#173f8a] py-3 font-semibold text-white hover:bg-[#102f6c]"
-                >
-                  Continue Booking
-                </button>
-              )}
-            </div>
-          </>
-        )}
-       
-      </div>
-    );
+{otherCharges.length > 0 && (
+  <p className="mt-1 text-[10px] text-gray-500">
+    Includes{" "}
+    <span className="font-medium">
+      {otherCharges
+        .map(
+          (c) => `${c.ChargesParticular} (${c.Percentage}%)`
+        )
+        .join(", ")}
+    </span>
+  </p>
+)}
+</div>
+
+          {!readOnly && (
+            <button
+              onClick={() => onContinue?.()}
+              className="w-full rounded-md bg-[#173f8a] py-2.5 text-sm font-semibold text-white hover:bg-[#102f6c]"
+            >
+              Continue Booking
+            </button>
+          )}
+        </div>
+      </>
+    )}
+  </div>
+);
   };
 
   export default BookingSummary;

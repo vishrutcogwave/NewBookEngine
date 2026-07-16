@@ -205,6 +205,8 @@ const childCount = 0;
               const planRooms = selectedRooms[plan.RatePlanId] || [];
 const remainingRooms =
   Math.max(0, room.Availability.RoomsLeft - bookedRooms);
+  const selectedRoomCount = planRooms.length;
+const canAddMore = selectedRoomCount < remainingRooms;
 const paxPrices = plan.PriceDetails?.[0]?.Prices?.[0] || {};
 
 // Always show Default Adult price on the card
@@ -599,7 +601,9 @@ onRemoveRoom(item.id);
 
         {/* Add More */}
         <button
+  disabled={!canAddMore}
   onClick={() => {
+    if (!canAddMore) return;
   const newRoom = {
     id: crypto.randomUUID(),
     adults: room.MaxOccupancy.DefaultAdult,
@@ -633,7 +637,11 @@ onRemoveRoom(item.id);
     newRoom.id
   );
 }}
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-[#163A84] text-lg font-bold text-white"
+          className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-lg font-bold transition ${
+  canAddMore
+    ? "bg-[#163A84] text-white hover:bg-[#0e2d66]"
+    : "cursor-not-allowed bg-gray-300 text-gray-500"
+}`}
         >
           +
         </button>
