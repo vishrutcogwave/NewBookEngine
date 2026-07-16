@@ -1,5 +1,4 @@
 import {
-  Star,
   MapPin,
   Phone,
   Mail,
@@ -45,19 +44,7 @@ const HotelInfo = ({
         <div className="flex flex-col justify-between gap-6 xl:flex-row">
           {/* LEFT */}
           <div className="flex-1">
-            <div className="flex items-center gap-1">
-              {[...Array(4)].map((_, i) => (
-                <Star
-                  key={i}
-                  size={13}
-                  className="fill-yellow-400 text-yellow-400"
-                />
-              ))}
-
-              <span className="ml-2 text-xs text-gray-500">
-                4-Star Hotel
-              </span>
-            </div>
+     
 
             <h1 className="mt-2 text-2xl font-bold text-[#0F172A] md:text-4xl">
               {name}

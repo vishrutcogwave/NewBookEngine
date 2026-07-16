@@ -242,17 +242,17 @@ const childPrice =
 
                   {/* HEADER */}
 
-                  <div className="flex p-3 sm:p-4">
+                  <div className="flex p-2.5">
 
-                 <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between w-full gap-6">
+                 <div className="flex items-start justify-between w-full gap-3">
 
   <div>
 
-    <h3 className="text-lg font-semibold text-gray-900">
+    <h3 className="text-sm font-semibold text-gray-900">
       {plan.RateShortName}
     </h3>
 {remainingRooms > 0 ? (
-  <p className="mt-2 text-base font-semibold text-red-500">
+  <p className="mt-1 text-xs font-medium text-red-500">
    {remainingRooms} available
   </p>
 ) : (
@@ -273,23 +273,21 @@ const childPrice =
 
   </div>
 
-  <div className="w-full text-left mt-4 lg:mt-0 lg:w-auto lg:text-right">
+<div className="shrink-0 text-right">
+  <div className="whitespace-nowrap">
+    <span className="text-lg font-bold text-[#1F2D5A]">
+      ₹{totalPerNight.toLocaleString()}
+    </span>
 
-<div className="flex items-center gap-2 justify-start lg:justify-end">
-  <span className="text-xl font-bold text-[#1F2D5A]">
-    ₹{totalPerNight.toLocaleString()}
-  </span>
-
-  <span className="text-sm text-gray-500">
-    / Night
-  </span>
-</div>
-
-<p className="mt-1 text-xs text-gray-500">
-  {adultCount} Adult{adultCount > 1 ? "s" : ""} Included • Taxes Extra
-</p>
-
+    <span className="ml-1 text-xs text-gray-500">
+      / Night
+    </span>
   </div>
+
+  <p className="mt-0.5 whitespace-nowrap text-[10px] text-gray-500">
+    {adultCount} Adult Included • Taxes Extra
+  </p>
+</div>
 
 </div>
 
@@ -299,7 +297,7 @@ const childPrice =
 
                   {/* PART 2 STARTS HERE */}
 
-                                    <div className="border-t bg-gray-50 p-3">
+                                 <div className="border-t bg-gray-50 p-2">
 
                     <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
 
@@ -355,7 +353,7 @@ onBookRoom(
 );
   }}
   disabled={remainingRooms <= 0 || planRooms.length > 0}
-  className={`w-full sm:w-auto rounded-lg px-6 py-3 font-semibold transition ${
+  className={`w-full md:w-auto md:min-w-[120px] rounded-md px-4 md:px-5 py-2 text-sm font-semibold transition ${
     remainingRooms <= 0
       ? "cursor-not-allowed bg-gray-400 text-white"
       : planRooms.length > 0
@@ -373,7 +371,7 @@ onBookRoom(
 {planRooms.map((item) => (
   <div
     key={item.id}
-    className="mt-4 border-t pt-4"
+    className="mt-2 border-t pt-2"
   >
     <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
 
@@ -381,10 +379,10 @@ onBookRoom(
         Room
       </span>
 
-      <div className="flex items-center gap-2 sm:gap-3">
+      <div className="flex items-center gap-2">
 
         {/* Adults */}
-        <div className="flex items-center rounded-full border border-gray-300 bg-white px-2 sm:px-3 py-2">
+        <div className="flex items-center rounded-full border border-gray-300 bg-white px-2 py-1">
 
           <button
           onClick={() => {
@@ -425,12 +423,12 @@ onBookRoom(
     item.id
   );
 }}
-            className="px-2 text-gray-500"
+            className="px-1 text-sm text-gray-500"
           >
             -
           </button>
 
-          <span className="px-2 text-sm sm:text-base font-medium whitespace-nowrap">
+          <span className="px-2 text-xs font-medium whitespace-nowrap">
             {item.adults} Adults
           </span>
 
@@ -476,7 +474,7 @@ onBookRoom(
     item.id
   );
 }}
-            className="px-2 text-[#163A84]"
+            className="px-1 text-sm text-[#163A84]"
           >
             +
           </button>
@@ -484,7 +482,7 @@ onBookRoom(
         </div>
 
         {/* Children */}
-        <div className="flex items-center rounded-full border border-gray-300 bg-white px-2 sm:px-3 py-2">
+        <div className="flex items-center rounded-full border border-gray-300 bg-white px-2 py-1">
 
           <button
   onClick={() => {
@@ -525,12 +523,12 @@ onBookRoom(
     item.id
   );
 }}
-            className="px-2 text-gray-500"
+            className="px-1 text-sm text-gray-500"
           >
             -
           </button>
 
-          <span className="px-2 text-sm sm:text-base font-medium whitespace-nowrap">
+          <span className="px-2 text-xs font-medium whitespace-nowrap">
             {item.children} Child
           </span>
 
@@ -573,7 +571,7 @@ onBookRoom(
     item.id
   );
 }}
-            className="px-2 text-[#163A84]"
+            className="px-1 text-sm text-[#163A84]"
           >
             +
           </button>
@@ -594,7 +592,7 @@ onBookRoom(
   // Remove from Booking Summary
 onRemoveRoom(item.id);
 }}
-          className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full border border-red-300 text-red-500"
+          className="flex h-8 w-8 items-center justify-center rounded-full border border-red-300 text-sm text-red-500"
         >
           🗑
         </button>
@@ -635,7 +633,7 @@ onRemoveRoom(item.id);
     newRoom.id
   );
 }}
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#163A84] text-xl font-bold text-white"
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-[#163A84] text-lg font-bold text-white"
         >
           +
         </button>
@@ -644,7 +642,7 @@ onRemoveRoom(item.id);
 
     </div>
 
-    <div className="mt-3 text-left lg:text-right font-semibold text-gray-900">
+    <div className="mt-2 text-right text-sm font-semibold text-gray-900">
     ₹{(
   (paxPrices[item.adults.toString()]?.AdultPrice ?? 0) +
   (paxPrices[item.children.toString()]?.ChildPrice ?? 0) *
