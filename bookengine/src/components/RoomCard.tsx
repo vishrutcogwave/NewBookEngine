@@ -6,7 +6,6 @@ import {
   ChevronRight,
   Wifi,
   Tv,
-  ShieldCheck,
 } from "lucide-react";
 import type {
   PriceDetail,
@@ -70,11 +69,11 @@ const childCount = 0;
   };
 
   return (
-<div className="grid grid-cols-1 xl:grid-cols-[420px_1fr] gap-4 md:gap-6 xl:gap-8 items-start rounded-2xl border bg-white p-3 sm:p-5 lg:p-6">
+<div className="grid grid-cols-1 xl:grid-cols-[200px_1fr] gap-4 md:gap-6 xl:gap-8 items-start rounded-2xl border bg-white p-3 sm:p-5 lg:p-6">
 
   {/* LEFT IMAGE */}
 <div className="lg:sticky lg:top-6 w-full">
-  <div className="relative h-56 sm:h-72 md:h-80 lg:h-[320px] xl:h-[360px] overflow-hidden rounded-2xl">
+  <div className="relative h-40 sm:h-44 md:h-48 lg:h-[180px] xl:h-[200px] overflow-hidden rounded-xl">
 
       <img
         src={room.RoomImages[currentImage]}
@@ -144,7 +143,7 @@ const childCount = 0;
 
             <div>
 
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
+          <h2 className="text-xl sm:text-2xl lg:text-2xl font-bold text-gray-900 leading-tight">
                 {room.RoomTypeName}
               </h2>
 
@@ -165,12 +164,12 @@ const childCount = 0;
 
           {/* Amenities */}
 
-          <div className="mt-6 flex flex-wrap gap-2 sm:gap-3">
+          <div className="mt-3 flex flex-wrap gap-2">
 
             {room.Amenities.map((item) => (
               <div
                 key={item}
-                className="flex items-center gap-2 rounded-full bg-gray-100 px-2 sm:px-3 py-2 text-xs sm:text-sm whitespace-nowrap"
+                className="flex items-center gap-1 rounded-full bg-gray-100 px-2 py-1 text-xs whitespace-nowrap"
               >
                 {item.toLowerCase().includes("king") && (
                   <BedDouble size={16} />
@@ -192,11 +191,11 @@ const childCount = 0;
 
           {/* Description */}
 
-          <p className="mt-5 text-sm sm:text-base leading-6 sm:leading-7 text-gray-600">
+          <p className="mt-3 text-sm leading-5 text-gray-600">
             {room.RoomTypeDescription}
           </p>
 
-          <div className="my-6 border-t" />
+          <div className="my-4 border-t" />
 
           {/* RATE PLANS */}
 
@@ -243,13 +242,13 @@ const childPrice =
 
                   {/* HEADER */}
 
-                  <div className="flex p-4 sm:p-5 lg:p-6">
+                  <div className="flex p-3 sm:p-4">
 
                  <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between w-full gap-6">
 
   <div>
 
-    <h3 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-900 leading-tight">
+    <h3 className="text-lg font-semibold text-gray-900">
       {plan.RateShortName}
     </h3>
 {remainingRooms > 0 ? (
@@ -270,41 +269,25 @@ const childPrice =
       </div>
     )}
 
-    <p className="mt-3 flex items-start gap-2 text-sm leading-6 text-green-700">
 
-      <ShieldCheck
-        size={16}
-        className="mt-1 flex-shrink-0"
-      />
-
-      {plan.CancellationPolicy}
-
-    </p>
 
   </div>
 
   <div className="w-full text-left mt-4 lg:mt-0 lg:w-auto lg:text-right">
 
-<h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#1F2D5A]">
-  ₹{totalPerNight.toLocaleString()}
-</h2>
+<div className="flex items-center gap-2 justify-start lg:justify-end">
+  <span className="text-xl font-bold text-[#1F2D5A]">
+    ₹{totalPerNight.toLocaleString()}
+  </span>
 
-    <p className="mt-1 whitespace-nowrap text-sm sm:text-base text-gray-500">
-      / Night
-    </p>
-<p className="mt-1 text-sm text-gray-500">
-  {adultCount} Adult{adultCount > 1 ? "s" : ""} Included
+  <span className="text-sm text-gray-500">
+    / Night
+  </span>
+</div>
+
+<p className="mt-1 text-xs text-gray-500">
+  {adultCount} Adult{adultCount > 1 ? "s" : ""} Included • Taxes Extra
 </p>
-
-{childCount > 0 && (
-  <p className="text-sm text-gray-500">
-    + {childCount} Child
-  </p>
-)}
-
-    <p className="text-sm text-gray-400">
-      (Exclusive of Taxes)
-    </p>
 
   </div>
 
@@ -316,7 +299,7 @@ const childPrice =
 
                   {/* PART 2 STARTS HERE */}
 
-                                    <div className="border-t bg-gray-50 p-4 sm:p-5">
+                                    <div className="border-t bg-gray-50 p-3">
 
                     <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
 

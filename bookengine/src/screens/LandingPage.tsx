@@ -266,63 +266,62 @@ const handleContinueBooking = () => {
 
   const { Hotel } = hotelData;
 
-  return (
-    <div className="min-h-screen bg-gray-100">
-      <Header
-        hotelName={Hotel.Name}
-        supportNumber={Hotel.HotelContact.MobileNo}
-      />
+return (
+  <div className="min-h-screen bg-gray-100">
+    <Header
+      hotelName={Hotel.Name}
+      supportNumber={Hotel.HotelContact.MobileNo}
+    />
 
-      <HotelInfo
-        name={Hotel.Name}
-        address={Hotel.HotelAddress}
-        mobile={Hotel.HotelContact.MobileNo}
-        email={Hotel.HotelContact.EmailId}
-        amenities={Hotel.Amenities}
-      />
+    <HotelInfo
+      name={Hotel.Name}
+      address={Hotel.HotelAddress}
+      mobile={Hotel.HotelContact.MobileNo}
+      email={Hotel.HotelContact.EmailId}
+      amenities={Hotel.Amenities}
+    />
 
-      <ImageGallery images={Hotel.Images} />
+    <ImageGallery images={Hotel.Images} />
 
-      <HotelDescription description={Hotel.HotelDetail} />
+    <HotelDescription description={Hotel.HotelDetail} />
 
-      <AvailabilityFilter
-        checkIn={checkInDate}
-        checkOut={checkOutDate}
-        nights={numNights}
-        onCheckInChange={setCheckInDate}
-        onCheckOutChange={setCheckOutDate}
-        onSearch={handleSearch}
-      />
+    <AvailabilityFilter
+      checkIn={checkInDate}
+      checkOut={checkOutDate}
+      nights={numNights}
+      onCheckInChange={setCheckInDate}
+      onCheckOutChange={setCheckOutDate}
+      onSearch={handleSearch}
+    />
 
-<div className="w-full px-4 py-8 xl:px-8 2xl:px-10">
-  <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_420px]">
+    <div className="w-full px-5 pb-6 md:px-10 xl:px-16">
+      <div className="grid grid-cols-1 gap-5 xl:grid-cols-[1fr_390px]">
 
-    {/* Room List */}
+        {/* Room List */}
+        <div className="min-w-0">
+          <RoomList
+            rooms={hotelData.RoomTypes}
+            selectedRooms={selectedRooms}
+            onBookRoom={handleBookRoom}
+            onRemoveRoom={handleRemoveRoom}
+          />
+        </div>
 
-    <div className="min-w-0">
-<RoomList
-  rooms={hotelData.RoomTypes}
-  selectedRooms={selectedRooms}
-  onBookRoom={handleBookRoom}
-  onRemoveRoom={handleRemoveRoom}
-/>
+        {/* Booking Summary */}
+        <div className="w-full xl:w-[390px] xl:sticky xl:top-4 self-start">
+          <BookingSummary
+            rooms={selectedRooms}
+            onRemoveRoom={handleRemoveRoom}
+            onContinue={handleContinueBooking}
+          />
+        </div>
+
+      </div>
     </div>
 
-    {/* Booking Summary */}
-
-    <div className="w-full xl:w-[420px]">
-<BookingSummary
-  rooms={selectedRooms}
-  onRemoveRoom={handleRemoveRoom}
-  onContinue={handleContinueBooking}
-/>
-    </div>
-
+    <Footer hotelName={Hotel.Name} />
   </div>
-</div>
-<Footer hotelName={Hotel.Name} />
-    </div>
-  );
+);
 };
 
 export default LandingPage;
